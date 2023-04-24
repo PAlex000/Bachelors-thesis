@@ -1,0 +1,30 @@
+\chapter*{Nyilatkozat}
+\addcontentsline{toc}{section}{Nyilatkozat}
+
+% A szövegben a dolgozat típusa alapján "diplomamunkámat" vagy "szakdolgozatomat"
+% szövegrészt készíti el. 
+\ifthenelse{\equal{\dolgozatTipusa}{Diplomamunka}}
+  {% True case
+   \newcommand{\dolgozatomat}{diplomamunkámat}%
+  }
+  {% false case
+   \newcommand{\dolgozatomat}{szakdolgozatomat}%
+  }
+%
+
+\noindent Alulírott \nev{} \szak{} szakos hallgató, kijelentem, hogy a dolgozatomat a Szegedi Tudományegyetem, Informatikai Intézet \tanszek{} Tanszékén készítettem, \szak{} diploma megszerzése érdekében. 
+
+Kijelentem, hogy a dolgozatot más szakon korábban nem védtem meg, saját munkám eredménye, és csak a hivatkozott forrásokat (szakirodalom, eszközök, stb.) használtam fel. 
+
+Tudomásul veszem, hogy \dolgozatomat{} a Szegedi Tudományegyetem Informatikai Intézet könyvtárában, a helyben olvasható könyvek között helyezik el.
+
+\vspace*{2cm}
+
+\begin{table}[!h]
+  \begin{tabular}{lc}
+    Szeged, \vegsoDatum{} \hspace{2cm}  & \makebox[7cm]{\dotfill} \\
+                                        & aláírás \\
+  \end{tabular}
+\end{table}
+
+\thispagestyle{plain}

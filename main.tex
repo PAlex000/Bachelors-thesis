@@ -1,0 +1,81 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[magyar]{babel}
+
+% magyar nyelv tamogatas
+\usepackage{t1enc}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% A formai kovetelmenyekben megkövetelt Times betűtípus hasznalata:
+\usepackage{times}
+
+\usepackage{setspace}
+\usepackage{listings,multicol}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[unicode,hidelinks]{hyperref}
+\usepackage{footnote}
+\usepackage{ifthen}
+
+% Törölhető package
+\usepackage{lipsum}
+
+% TODO csomag, amivel jól észrevehető todokat hagyhatunk a dolgozatban
+\usepackage{todonotes}
+% Inline TODO
+\newcommand{\todoi}[1]{\todo[inline]{\textbf{TODO:} #1}}
+
+% egyedi lablec
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\graphicspath{{fig/}}
+
+% Kódrészletes színezése
+\input{listings_def}
+\renewcommand{\lstlistingname}{Kódrészlet}
+
+% Margók beállítása
+\hoffset -1in
+\voffset -1in
+\oddsidemargin 35mm
+\textwidth 150mm
+\topmargin 15mm
+\headheight 10mm
+\headsep 5mm
+\textheight 237mm
+
+% Szerző és dolgozat adatai
+\input{metadata}
+
+\begin{document}
+
+% Másfeles sorköz
+\setstretch{1.5}
+\sloppy
+
+\include{tex/0_title}
+\pagenumbering{arabic}
+\include{tex/0_feladat}
+\include{tex/0_tartalmi}
+\include{tex/0_toc}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textit{\cim}}
+\fancyfoot[R]{\thepage}
+\fancypagestyle{plain}{%
+    \renewcommand{\headrulewidth}{0pt}%
+    \fancyhf{}%
+    \fancyfoot[R]{\thepage}%
+}
+\include{tex/1_elso}
+\include{tex/2_masodik}
+\include{tex/3_conclusion}
+\include{tex/nyilatkozat}
+\include{tex/acknowledgement}
+\include{references}
+
+\end{document}
