@@ -87,7 +87,7 @@ Végül a source attribútuma egy StringLiteral, nálunk is így szerepel.
 Természetesen ami sötétszürkével van jelölve, az máshol létre van hozva és vannak neki attribútumai.
 A világosszürke annyit jelöl, hogy ebben a packageben lett létrehozva az osztály, de láthatóság szempontból többször szerepel, mivel lehet attribútum is.
 Így lett minden egyes osztály felépítve, természetesen \Aref{fig:declaration_vpp} ábra csak egy részlete a declaration packagenek, ennél jóval nagyobb.
-Vannak úgynevezett gyűjtő osztályok is, mint pl a Statement, ezekre azért van szükség, mert majd később ha le lett generálva minden, akkor tudjunk majd vizsgálni különböző nodeokra, mint például isStatement().
+Vannak úgynevezett gyűjtő osztályok is, mint pl a Statement, ezekre azért van szükség, mert majd később ha le lett generálva minden, akkor tudjunk majd vizsgálni különböző nodeokra, mint például az isStatement.
 
 \noindent
 
@@ -168,7 +168,7 @@ Az előző JavaScriptSchema (ami csak javascriptet elemzett) az a javascript hiv
 Több opció is volt, hogy most vagy legyen átírva a schéma, vagy legyen egy külön typescriptre is írva.
 Végül rájöttünk, hogy ha van egy typescriptes schémánk, az képes javascriptet ugyanúgy elemezni ha megfelelően van lefejlesztve.
 Így egy schémát fejlesztettünk le. Az előző schéma átláthatatlan volt, ezért úgy döntöttünk, hogy majdnem a nulláról újraírjuk.
-Egyedül a base packaget emeltük át a régiből, BaseNode-al és BaseTokennel kibővítve(\Aref{fig:base_vpp} ábrán látható).
+Egyedül a base packaget emeltük át a régiből, BaseNode-al és BaseTokennel kibővítve (\Aref{fig:base_vpp} ábrán látható).
 Emellett el kellett dönteni, hogy milyen struktúrát kövessünk, ami jól átlatható és később könnyebben bővíthető.
 Végül a typescript-eslint official github alapján haladtunk. Annyi változtatással, hogy ami nekik a base mappában volt, mi arra létrehoztunk egy külön structure packaget.
 Mindenhez készítettünk dokumentációt, jól érthetően leírtuk, hogy mit miért kellett csinálni.
@@ -211,7 +211,7 @@ A Literal volt a hiba, mivel ezt nem a github alapján írtuk meg, hanem egyedi 
       \includegraphics[width=0.8\textwidth]{literal.png}
 \end{figure}
 
-\Aref{fig:literal} ábrán látható, hogy a LiteralExpressionből(Ami a Literal) több literal is öröklődik.
+\Aref{fig:literal} ábrán látható, hogy a LiteralExpressionből (Ami a Literal) több literal is öröklődik.
 \begin{lstlisting}[caption={Literal},label={lst:asg_file_literal}, language={JavaScript}]
 export interface LiteralBase extends BaseNode {
   type: AST_NODE_TYPES.Literal;
