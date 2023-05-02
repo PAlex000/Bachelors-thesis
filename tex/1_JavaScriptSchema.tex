@@ -1,6 +1,5 @@
-\chapter*{JavaScriptSchema}\stepcounter{chapter}
-\addcontentsline{toc}{chapter}{JavaScriptSchema}
-%\chapter{JavaScriptSchema átírása}\label{chap:JavaScriptSchema átírása}
+\chapter{JavaScriptSchema átírása}\label{chap:JavaScriptSchema átírása}
+
 \section{A JavaScriptSchemáról}
 
 \noindent
@@ -128,10 +127,7 @@ Ezután a Kinds mappa tartalmát írja bele a következőképpen:
 KIND ASTNodeTypes (ant) {
       FunctionDeclaration;
       BlockStatement;
-      ClassDeclaration;
-      TSTypeParameterDeclaration;
-      TSTypeParameter;
-}
+      ClassDeclaration;}
 \end{lstlisting}
 Az a 3 karakter amit minden constant elé tettünk azt kitette paraméterbe és csak az utáni stringet írta át. Ugyanígy van a többi kindnál is.
 Ha az összes kindot beleírta, akkor kezdi írni sorban a többi packaget. \Aref{fig:JavaScriptSchema_struktura} alapján megy sorba.

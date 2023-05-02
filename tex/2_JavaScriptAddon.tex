@@ -1,9 +1,105 @@
-\chapter*{JavaScriptAddon szerkesztése}\stepcounter{chapter}
-\addcontentsline{toc}{chapter}{JavaScriptAddon szerkesztése}
--mit ad factory, mi ez a külön file
--Miben változott
-% \chapter{JavaScriptAddon szerkesztése}\label{chap:JavaScriptAddon szerkesztése}
+\chapter{JavaScriptAddon}\label{chap:JavaScriptAddon}
 
 \section{JavaScriptAddonról}
 
+\noindent
+
+A JavaScriptAddon az egy node kiterjesztésű file, amit a SchemaGenerator generál. Minden egyes nodehoz külön generál header és src filet.
+Ezeket a fileokat aztán mergeli, és ebből lesz a javascriptAddon.
+A SchemaGenerator a JavaScriptSchemából és az ebből generált asgből generálja le a javascriptAddon.node filet.
+A SchemaGeneratornak több generálása is definiálva van, hiszen nem csak erre használják. Nekünk a NodeAddonGenerator.c fileban és a hozzátartozó header fileban van minden.
+A main.c-be ezt beimportálja, és ennek hívja meg egyes metódusait, ami által elkészül a javascriptAddon.
+A következő pár oldalon bemutatnám, hogy a generálás hogyan zajlik.
+A SchemaGeneratornak rengeteg kapcsolojó van, köztük a generateNodeAddon is. Ezekre a kapcsolókra vizsgál egyesével, egy nagy if-elseben.
+\begin{lstlisting}[caption={SchemaGenerator kapcsoló vizsgálás},label={lst:schemagenerator_argv_genNodeAddon}, language={CStyle}]
+else if(!strcmp(argv[i], "-genNodeAddon")){
+      options.generateNodeAddon = true;
+}
+\end{lstlisting}
+A kód elején történik meg ez, ha meg van adva paraméternek a genNodeAddon string, akkor az options.generateNodeAddon-t igazra állítja. A default értéke false.
+Ezután jóval lentebb miután rengeteg mindent legenerált ami kell alapból is a normális működéshez, vizsgál egyet az options.generateNodeAddon-ra.
+Ez látható \aref{lst:schemagenerator_genNodeAddon_check} kódrészleten is. Else ága nincs, szóval semmi nem történik ha nincs megadva a genNodeAddon string a paramétereknél.
+\begin{lstlisting}[caption={SchemaGenerator javascriptAddon generálás},label={lst:schemagenerator_genNodeAddon_check}, language={CStyle}]
+//generate Node.JS Addon if specified
+if(options.generateNodeAddon ){
+      debugMessage(0, "Generating Node.JS Addon sources\n");
+      if (createAndEnterDirectory(SOURCE_NODE_ADDON_DIR_NAME)) {
+      generatePackageJson();
+      generateBindingGyp();
+      generateAddonCC();
+      generateFactoryWrapper();
+
+      if (createAndEnterDirectory("inc")) {
+      generateWrapperHeaders();
+      leaveDirectory();}
+      if(createAndEnterDirectory("src")){
+      generateWrapperSources();
+      leaveDirectory();}
+
+      leaveDirectory();}
+}
+\end{lstlisting}
+
+A createAndEnterDirectory metódus annyit csinál, hogy létrehoz egy mappát és chdirrel belelép. Ha az adott mappa már létezik, akkor csak szimplán belelép.
+A SOURCE NODE ADDON DIR NAME változó jelen esetben addon értéket fog kapni, hiszen a javascriptAddon dolgai ebbe fognak generálódni.
+Miután létrehozta és/vagy belelépett az addon mappába először legenerálja a package.json filet a projekthez.
+A package.json fileban beállítja a projektnevét, verziószámát, dependencyket, scripteket és a végén a gypfile kapcsolónak egy true-t beállít.
+\begin{lstlisting}[caption={NodeAddonGenerator package.json scripts}, label={lst:nodeAddonGenerator_package_json}, language={CStyle}]
+fprintf(f, "    \"rebuild\": \"node-gyp configure && node-gyp rebuild -j 8\",\n");
+fprintf(f, "    \"install\": \"node-gyp configure && node-gyp build -j 8\"\n");
+\end{lstlisting}
+\Aref{lst:nodeAddonGenerator_package_json} kódrészleten látható, hogy majd gyp segítségével fog történni a generálás.
+
+\noindent
+
+Ezután legenerálja a binding.gyp filet. Ez a file fog felelni azért, hogy a javascriptAddon legenerálódjon sikeresen. Ha ez megtörtént, utána fogja legenerálni az addonCC-t.
+Az addon.cc fileban beimportálja a Factory.h headert, amiben több metódus is megtalálható.
+\begin{lstlisting}[caption={Addon.cc Wrapperek includolása}, label={lst:addoncc_wrapper_include}, language{CStyle}]
+if (!traversalDescendantBFT(rootNode, generateWrapIncludes, false)) {
+      debugMessage(0, " failed\n");
+      fclose(f);
+      return false;
+}
+\end{lstlisting}
+
+\Aref{lst:addoncc_wrapper_include} kódrészletben a traversalDescendantBFT metódus a Factory.h-ban lett létrehozva.
+Ez egy bejárás, ami az összes nodera lefut, és az összes nodera meghívja a generateWrapIncludes metódust.
+Ez a generateWrapIncludes a nodeAddonGenerator.c fileban van leimplementálva a következőképp:
+\begin{lstlisting}[caption={generateWrapIncludes leimplementálása}, label={lst:addoncc_wrapper_includes_implementation}, language{CStyle}]
+if(node->type.abstract){
+      return true;
+}
+fprintf(f, "#include \"");
+fprintf(f, "inc/%sWrapper.h\"\n", node->name );
+return true;
+\end{lstlisting}
+Először megvizsgálja, hogy az adott node abstract-e, ha nem akkor tovább megy, és az addon.cc-be includolja az adott wrappert.
+A node->name lehet például FunctionDeclaration, ClassDeclaration, amik megtalálhatóak az asg fileban.
+
+Ezután ezt a bejárást mégegyszer végrehajtja, de most a wrapperIniteket generálja az addon.cc fileba.
+Annyi változtatással, hogy picit mást ír az addon.cc fileba.
+\begin{lstlisting}[caption={generateWrapInit leimplementálása}, label={addoncc_wrapper_inits_implementation}, language={CStyle}]
+fprintf(f, "  columbus::%s::asg::addon::%sWrapper::Init(env, exports);\n", schemaName, node->name);
+\end{lstlisting}
+
+Ha ezek megtörténtek, akkor az addon.cc filet legeneráltuk sikeresen, és így benne találhatóak a wrapperek includolása és a wrapperek Initjei.
+
+\noindent
+
+Ezután következett a generateFactoryWrapper. A generateFactoryWrapperben 2 metódus hivás található, a generateFactoryWrapperHeader és generateFactoryWrapperSource.
+A generateFactoryWrapperHeader a Factory.h filet generálta le, a generateFactoryWrapperSource pedig a Factory.cc filet.
+Ebben a Factory.cc fileban található az összes metódus, amit fog használni a javascriptAddon.
+Emellett az összes nodeWrapper includeolva van, amit ezután fog létrehozni.
+
+\noindent
+
+Utolsó lépésként, először az inc mappát majd az src mappát generálja le a SchemaGenerator.
+Az inc mappában találhatóak a header fileok egyes wrappereknek, az src mappában maguk a wrapperek vannak megvalósítva.
+\todoi{Megnézni egy wrapper megvalósítást bent és leírni.}
+%generateFactoryWrapper
+%mi ez a külön file
+% mi ez a factory, hogyan használja a JSAN
+%-mit ad factory, mi ez a külön file
+%-Miben változott
+% Megemlíteni, hogy a main.cppben hogy generálja le az addont
 \section{Miben változott}
