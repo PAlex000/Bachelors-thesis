@@ -1,15 +1,80 @@
 \chapter{AST Binder Optimalizálás}\label{chap:AST Binder Optimalizálás}
--node addon mi
--miért lassú
--javítás, ha lehet, vagy ha nem, miért
-- nehézségek, eredmények 
 
+\section{A binderről}
 
-\section{Binderről}
+\noindent
+
+Az AST binder referenciákat bindol. Ezek a referenciák a JSAN2Lim programhoz kellenek.
+Binder néven van definiálva az astTransformer.js fileban.
+Kétszer van használva, ezért is kulcsfontosságú, hogy gyors legyen.
+Egyszer VariableUsages referenciákat bindol és egyszer ACG referenciákat bindol.
+\noindent
+
+A binder 4 argumentumot vár:
+\begin{itemize}
+      \item Egy stringet, ami lehet vagy VU (ami VariableUsages-t rövidíti) vagy ACG (egy javascript callgraph).
+      \item Egy Abstract Syntax Tree-t (AST), ami egyedien van felépítve.
+      \item Egy tömböt, amiben JSON objektumok találhatóak, amik a linkeket tartalmazzák.
+      \item Végül még egy stringet, ami lehet addCalls, vagy setRefersTo. Az AddCalls és a SetRefersTo a javascriptAddonban található meg. Akkor addCalls ha ACG referenciákat bindolunk és akkor setRefersTo ha VU referenciákat.
+\end{itemize}
+
+Egy JSON objektum a következőképp néz ki:
+\begin{lstlisting}[caption={Binder JSON argumentuma}, label={lst:binder_json_arg}, language={JavaScript}]
+source: {
+      label: IdentifierNeve,
+      file: AbsPath,
+      start: { row: <int>, column: <int>},
+      end: { row: <int>, column: <int>},
+      range: { start: <int>, end: <int>},
+      node: [Object]
+},
+target: {...}
+\end{lstlisting}
+
+\noindent
+
+\Aref{lst:binder_json_arg} kódrészletben egy JSON elemét láthatjuk a tömbnek. Ilyen JSON elemekből épül fel a tömb.
+A source és a target felépítése ugyanaz, csupán másak az értékek bennük.
+A kódrészletben csak a sourcet fejtettem ki kicsit bővebben. A label az egy Identifiert vagy PrivateIdentifiert fog jelölni.
+A file egy abszolút útvonalat, ami az Identifiert tartalmazó filet jelöli.
+A start az egy object, amiben külön van sor és oszlop meghatározva. Ez az Identifier első karakter pozíciójának a sor és oszlop értékei.
+Az end ugyanaz, mint a start, csak itt az utolsó karakter pozíciójának a sor és oszlop értékei.
+A range is egy object, a start ennél a kezdő karakter hanyadik karakter volt a kódban, és az end pedig az identifier utolsó karakterének a karakterszáma.
+A node is egy object.
 
 \section{Lassúság okai}
 
+A binder nagyobb projektekre nagyon lassan fut le. Ennek több oka is van:
+\begin{itemize}
+      \item Minden hívásnál meghívja a javascriptAddon.nodeot, ami már magában nagy file. TypeScript támogatás után kétszeres lett a mérete, ezáltal sokkal lassabb lett.
+      \item Mivel nagyobb a projekt, ezért sokkal több a függvény hívás is az elemzett kódban, emellett sok a változószám is.
+      \item Az AST nagyon nagy, és ezt bejárjuk többször is bindolás alatt. Emiatt nagyon lassú a program nagy projektek esetén.
+      \item A JSON objektum is nagyon nagy lesz, de annyira ez nem lassítja le a programot.
+\end{itemize}
+
 \section{Optimalizálás}
 
-\section{Eredmény}
+\noindent
 
+Először ki kellett derítenem, pontosan melyik funkció mennyi memóriát vesz igénybe és milyen gyorsan fut le.
+Erre találtam egy javasript profilert, ami kiírta minden függvén hívásnál a memóriafoglalást.
+Ez nekem nem volt a legjobb, mivel nagyon egybe van ágyazva minden, és eléggé mélyre mentek a functionok.
+Ezután próbáltam picit egyszerűbbet, a binder kódját 3 részre osztani, console.time és console.timeEnd használatával.
+Így megkaptam, hogy melyik rész nagyjából mennyi idő alatt fut le, könnyebb volt szűkíteni, hogy melyik function lesz a bajos.
+Végül kiderült, hogy a következő sor lassítja be nagyon a programot:
+\begin{lstlisting}[caption={Problémás function}, label={lst:binder_problemas_function}, language={JavaScript}]
+globals.getWrapperOfNode(resolveNode(astSet, sourceFile, element.source.range.start, element.source.range.end, true));
+\end{lstlisting}
+
+Ezen belül is a resolveNode function volt a probléma, mivel a resolveNode kapott egy AST-t (amit a binder kapott meg paraméterbe), egy filenevet, kezdő és vég paramétert, illetve egy true vagy falset, attól függ, hogy sourcenodeot vagy targetnodeot keresünk.
+Az AST-n forEach-el végigmentünk, amin belül walk-al bejártuk addig amíg nem találtuk meg a számunkra kellő filet.
+Kisebb projekt esetében ez nem baj, mivel az AST nem annyira nagy. Ahol már van 100 vagy 200 ezer változó és vagy függvény hívás, ott már nagy gondok lehetnek, mivel ezt rengetegszer meg kell ismételni, ami iszonyat lassú.
+Nem elég ezt egyszer megtenni, kétszer kell, mivel ezt a VU-ra és az ACG-re is végre kellett hajtani.
+
+\noindent
+
+Így már tudtam, hogy mit kell átírni, vagy átgondolni, hogy hogyan lehetne ezt a többszöri bejárást csak egyszer végrehajtani, és az adott tömbből adatokat kinyerni.
+%getIndexed --> ugyanolyan paraméterek, mint a resolveNodenál, kivéve annyival, hogy nem kap ast-t.
+% Tömbbe tesszük be, picit jobban kifejteni, hogy mit miért. JavaScript profilerről szót ejteni, hogyan derítettem ki, hogy mi használ sok memóriát és lassú
+\section{Eredmény}
+% 5-10x gyorsulás nagyobb projekteken, ide majd egy képet, hogy before/after egy adott projektre, kevesebb memória igény
