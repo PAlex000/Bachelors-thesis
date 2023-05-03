@@ -1,13 +1,28 @@
 \chapter{Összefoglaló}\label{chap:Összefoglaló}
 
-- javult a program
-- VPP up do datere hozása
-- JSAN további optimalizálása
 \section{Program javulása}
 
-\section{Tervek}
+\noindent
 
-\subsection{JavaScriptSchema naprakészre hozása}
+A szakdolgozatom során sikerült elérnem azt, hogy az Ast binder közel tízszer gyorsabban fut le nagyobb projektre, mint ezelőtt.
+Leteszteltem ugyanarra a nagy projektre az eredeti JSAN lefutását és az én általam átírt lefutását. Ezt \Aref{lst:jsan_before_after_comparison} kódrészleten láthatjuk.
+Kisebb projektekre körülbelül ötszörös gyorsulás van.
+\begin{lstlisting}[caption={JSAN lefutási idő előtte és utána}, label={lst:jsan_before_after_comparison}]
+PlaceHolder
+\end{lstlisting}
 
-\subsection{JSAN további optimalizálása}
+Emellett a JavaScriptSchema újraírása is sikeres volt, emiatt a JSAN tud typescriptes kódokat elemezni.
+JSAN2Limet sikeresen módosítottam, hogy a JSAN által kiadott outputot sikeresen limmé alakítsa.
+\section{Jövőbeli tervek}
 
+\noindent
+
+JavaScriptSchema bővítése sok időbe telt, mivel se dokumentáció, se tapasztalat nem volt. Ezután még a JSAN2Lim átírás is sok időbe került.
+Eközben a typescript-eslint github repo amit használtunk a bővítésre, frissült, sok új funkciót hoztak be.
+Rengeteg változtatás volt a typescript résznél, de a schémát nem tudtuk még naprakészre hozni, mivel voltak ennél fontosabb feladatok.
+Egyik jövőbeli terv az, hogy a schémát up to datere hozzam, mivel már van hozzá dokumentáció is, meg nagyjából én is írtam, ezért nem lesz ez annyi idő, mint volt az elején az újraírása.
+
+\noindent
+
+Végül a JSAN programra még bőven ráfér az optimalizálás, mivel csak az ast bindert optimalizáltuk, rengeteg helyen feleslegesen van bejárva az ast.
+Ez a másik jövőbeli terv.
