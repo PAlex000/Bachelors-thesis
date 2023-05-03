@@ -1,14 +1,108 @@
 \chapter{Regteszt frissítés}\label{chap:Regteszt frissítés}
 
-jobb lett, mükszi
-hogy van tesztelve, output és performance vizsgálat
-TS tesztek hozzáadása / eredmények átnézése
-Specifikusabb tesztek hozzáadása (kapcsolókra tesztelünk --> JSAN / ESlintrunner 1 mappa / 1 kapcsoló)
-Python beli nehézségek tesztátírás során
+\section{A regressziós tesztelésről}
 
+\noindent
 
-\section{Röviden a regtesztről}
+A Sourcemeter Javascript projektben regressziós tesztelés folyik, mint tesztelési folyamat.
+A regressziós teszt segítségével hamar tudunk hibákat kiszűrni fejlesztés során.
+Ez a következőképpen zajlik a projekten:
+
+\begin{itemize}
+      \item Cmake segítségével először legeneráltatjuk a megfelelő fileokat. Vcxproj illetve make fileokat, használt operációs rendszertől függően.
+      \item Visual Studio 2017 vagy make segítségével lebuildeljük a Regtest\_javascript targetet.
+      \item A Regtest\_javascript buildelése során ellenőrizzük, hogy az adott projekt le van-e már buildelve. Ha nem, akkor lebuildeljük tesztelés előtt.
+      \item Tesztelés közben, programonként írja ki a konzolra, hogy sikeres vagy sem az adott teszt.
+      \item Tesztelés végén egy regtest.xml fileba írja az összesített eredményeket fileokra lebontva.
+      \item Ha valami differencia van a referenciához képest, akkor azt egy külön diff kiterjesztésű fileban jelzi a rendszer nekünk, az elvárt és a kapott eredményt beleírva.
+\end{itemize}
 
 \section{Tesztekről}
 
+\noindent
+
+A Regtest\_javascript target több programot foglal magában, nem csak a JSAN-t. Egészen pontosan a következőket:
+JSAN, JSAN2Lim, LIM2Metrics, LIM2Patterns, ESLintrunner, ESLint2Graph, ChangeTracker, DuplicatedCodefinder és SourceMeter projekteknek tartalmazza a tesztjeit javascriptes (és mostmár typescriptes) fileokra.
+Én a JSAN, JSAN2Lim, ESLintrunner és a SourceMeter projekteknek változtattam a tesztelésén.
+Eddig a tesztelés úgy zajlott, hogy beadtunk inputnak pár nagyobb filet, és lefuttattuk rá a programot amit tesztelni szerettünk volna, és megnéztük az outputot.
+Azt kaptam feladatnak, hogy a tesztelési logikát írjam át arra, hogy kapcsolókra is teszteljünk.
+Ez azt jelentette, hogy minden kisebb projektnek vannak külön kapcsolói. Eddig mindig csak egy adott sorral futtattuk le a programot, és nem volt az tesztelve, hogy pl useRelativePath működik-e az elvártak szerint vagy sem.
+
 \section{Tesztek kibővítése}
+
+\noindent
+
+Először kezdtem a JSAN tesztek átírásával. A JSAN-nak a következő kapcsolói voltak:
+\begin{itemize}
+      \item -i:Jelentése input, lehet relatív vagy abszolút útvonal a filehoz vagy projekthez.
+      \item -o:Jelentése output neve, lehet relatív vagy abszolút útvonal.
+      \item -d:Jelentése dumpjsml, a JSAN outputját átgenerálja XML stílusú fileba és ezt egy jsml fileba kiírja.
+      \item -e:Jelentése ExternalHardFilter, relatív vagy abszolút útvonal egy olyan filehoz, ami szövegalapú és olyan syntax található benne, ami kell az externalHardFilternek
+      \item -help:Jelentése help, kiírja minden kapcsolóhoz tartozó descriptiont.
+      \item -r:Jelentése useRelativePath, outputban az útvonalakat átírja relatív útvonalra.
+      \item -h:Jelentése html, a JSAN html fileokra is lefut, bennük keresve javascriptes scripteket és azokat tesztelni.
+      \item -stat:Jelentése statistics, Kiírja a memóriahasználatot és a futásidőt amit a JSAN vett igénybe.
+\end{itemize}
+
+\noindent
+
+Az input, output, dumpjsml, ExternalHardFilter, és html kapcsolókra tudtam tesztelést írni. A logika az volt, hogy mappanév alapján tesztelek egyes kapcsolókra.
+ProgramozásiNyelv-kapcsolónév logikát követtem, mivel javascriptes tesztek mellé kell majd typescriptes teszteket is keresnem.
+A projekteket python scriptek segítségével futtattam le.
+
+\begin{lstlisting}[caption={JSAN kapcsoló vizsgálat pythonban}, label={lst:python_kapcsolo}, language={Python}]
+if "externalHardFilter" in input_path:
+      ret_val = self._execute_one_test(input_path, external_hard_filter=True) and ret_val
+      return ret_val
+\end{lstlisting}
+
+\Aref{lst:python_kapcsolo} kódrészleten látható, hogy hogyan keresek egy adott kapcsolóra. Az input\_pathban van a mappa is, és ugye a js-externalHardFilter-ben megtalálható az externalHardFilter szó.
+Az execute\_one\_test függvényemben beállítom a teszteléshez az adott dolgokat.
+
+\begin{lstlisting}[caption={JSAN kapcsoló beállítása pythonban}, label={lst:python_kapcsolo_beallitasa}, language={Python}]
+if external_hard_filter:
+      input_dir = os.path.dirname(input_path)
+      external_hard_filter_path = os.path.join(input_dir, "externalHardFilter.txt")
+      external_hard_filter_switch = "-e"
+else:
+      external_hard_filter_path = ""
+      external_hard_filter_switch = ""
+\end{lstlisting}
+
+\Aref{lst:python_kapcsolo_beallitasa} kódrészletben az execute\_one\_test függvénynek egy részét láthatjuk, ahol beállítjuk az external\_hard\_filter\_path-t és a switchet annak függvényében, hogy igazat kaptunk e vagy sem.
+Utána kellett néznem, hogy egy ExternalHardFilter file hogy is néz ki, hogyan kell használni.
+A használata a következő: létrehozzuk az externalHardFilter filet a tesztelendő file mellé vagy a tesztelendő projekt gyökerébe,
+és attól függően, hogy ki akarjuk hagyni az adott filet vagy hozzáadni, írunk egy $+$ vagy egy $-$ jelet a sor elejére és utána relatív útvonal és a file neve.
+Alapértelmezetten minden filet leelemez az adott program, JSAN esetében ezek azok a fileok amiknek a kiterjesztése js,jsx. (külön kapcsolóval megadhatjuk neki, hogy a html kiterjesztésű fileokat elemezze-e vagy se.)
+Typescriptes bővítés után már a ts és a tsx kiterjesztésű fileokat is elemzi. Ezért írtam több tesztesetet is. Egy példa, hogy hogyan néz ki ez a file:
+
+\begin{lstlisting}[caption={ExternalHardFilter file}, label={lst:external_hard_filter}]
+-filtered01
+-filtered02
+-filtered03
++filtered01
+\end{lstlisting}
+
+\Aref{lst:external_hard_filter} kódrészletben látható, hogy filtered01 02 és 03 at kivettük, hogy azokat ne elemezze a jsan.
+Ezután visszavettük a filtered01et. A filtered fileok azok javascriptes fileok, javascriptes kóddal.
+Ezután referenciába csak a filtered01 file outputját raktam be, hiszen a 02 és 03at nem elemzi, ha elemezné, akkor szólna a program, hogy missing reference file.
+Természetesen lehet regexpet is használni filterezésnél.
+
+\noindent
+
+Ezután teszteltem a $-i$ kapcsolót, itt ugye a programnak vissza kellene adnia, hogy üres az input ha nincs megadva.
+Ezután a $-o$ kapcsolóra teszteltem, itt ebben az esetben default értékben $out.jssi$ filet kellene visszaadnia.
+Végül a $-h$ kapcsolót néztem meg, itt ha megvan adva ez a kapcsoló, akkor az adott projektben a html fileokban a javascriptet kellene tesztelni.
+A $-d$, $-help$, $-stat$ kapcsolókra nem tudtam tesztelni, még a $-useRelativePath$ kapcsolóra sem, hiszen ha abszolút utat kérek, akkor a referenciákban másnál rossz lesz az elvárt eredmény.
+
+\noindent
+
+Ezután a JSAN2Lim és az ESlintrunner programoknak írtam át a tesztelési menetetét, mivel nekik volt még olyan kapcsoló, amit lehetett tesztelni. A többi projektnek 1 vagy 2 volt, amik kellettek a működésükhöz, nem voltak opcionális kapcsolók.
+
+\noindent
+
+Miután a JSAN ki lett egészítve typescriptes supportal és a JSAN2Limet átírtam, hogy a JSAN általi typescript elemzéseket jól olvassa be, ideje volt teszteket keresni, mind JSAN-nak és mind JSAN2Limnek.
+Kerestem egyszerűbb typescript és picit összetettebb typescriptes projekteket is, hogy lássam a hiányosságokat.
+Természetesen ami outputokat adtak a programok, azokat át kellett néznem egyesével, hiszen csak így tudom meg, hogy jól tesztelte-e a megadott filet vagy sem.
+Több hiányosságot is észrevettem, mind JSAN oldalról, mind JSAN2Lim oldalról, ezek kisebb hiányosságok voltak.
+Például, hogy egy nodenak nem volt beállítva pozíció, vagy nem volt jól beállítva a paramétere.
