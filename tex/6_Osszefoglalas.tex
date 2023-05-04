@@ -7,9 +7,19 @@
 A szakdolgozatom során sikerült elérnem azt, hogy az Ast binder közel tízszer gyorsabban fut le nagyobb projektre, mint ezelőtt.
 Leteszteltem ugyanarra a nagy projektre az eredeti JSAN lefutását és az én általam átírt lefutását. Ezt \Aref{lst:jsan_before_after_comparison} kódrészleten láthatjuk.
 Kisebb projektekre körülbelül ötszörös gyorsulás van.
+Lefuttattam egy nagyobb projektre a jsan-t, az optimalizált és az optimalizálatlan verzióval, hogy jobban lássuk a különbséget. A következő eredmények születtek:
+
 \begin{lstlisting}[caption={JSAN lefutási idő előtte és utána}, label={lst:jsan_before_after_comparison}]
-PlaceHolder
+Optimalizalt_verzio:
+Binding VU: 71599/71599
+VU binding: 1:39.140 (m:ss.mmm)
+
+Optimalizalatlan_verzio:
+Binding VU: 71599/71599
+VU binding: 42:31.211 (m:ss.mmm)
 \end{lstlisting}
+
+Ugyanazt az outputot adja mind a kettő program, szóval csak gyorsaságban és memóriahasználatban változott sokat.
 
 Emellett a JavaScriptSchema újraírása is sikeres volt, emiatt a JSAN tud typescriptes kódokat elemezni.
 JSAN2Limet sikeresen módosítottam, hogy a JSAN által kiadott outputot sikeresen limmé alakítsa.
