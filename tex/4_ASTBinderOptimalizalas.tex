@@ -60,7 +60,7 @@ A binder nagyobb projektekre lassan fut le. Ennek több oka is van:
 \noindent
 
 Először ki kellett derítenem, pontosan melyik funkció mennyi memóriát vesz igénybe és milyen gyorsan fut le.
-Erre találtam egy javasript profilert, ami kiírta minden függvén hívásnál a lefoglalt memóriát és a memória használatot.
+Erre találtam egy javascript profilert, ami kiírta minden függvényhívásnál a lefoglalt memóriát és a memória használatot.
 Ez nekem nem volt a legjobb, mivel nagyon egybe van ágyazva minden, és eléggé mélyre mentek a functionok.
 Ezután próbáltam picit egyszerűbbet, a binder kódját 3 részre osztani, ${console.time()}$ és ${console.timeEnd()}$ használatával.
 Ez a ${console.time()}$ parancs kiírja nekem ms-ben, hogy mennyi idő telt el amíg eljutott a ${console.timeEnd()}$ig.
@@ -122,6 +122,3 @@ A ${getIndexed()}$ függvény megvizsgálja, hogy source vagy targetNodeot keres
 Ha targetNodeot keresünk, akkor walkolunk ismét, de nem az ast-ben, hanem már a beindexelt tömbben.
 Ez lényegesen gyorsabb, mint a resolveNodeos megoldás, mert ott minden egyes esetben az ast-n walkoltunk, itt meg csak egy beindexelt elemén a tömbnek.
 Ha megkaptuk a sourceNodeot akkor returnoljuk a ${getWrapperOfNode(result)}$t.
-\section{Eredmény}
-% 5-10x gyorsulás nagyobb projekteken, ide majd egy képet, hogy before/after egy adott projektre, kevesebb memória igény
-\todoi{Ez lehet nem kell ide, majd összefoglalóban írni erről.}
