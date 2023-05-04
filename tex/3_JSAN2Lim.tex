@@ -6,8 +6,8 @@
 
 A JSAN2Lim egy c++-ban megírt program. A JSAN általi outputot átalakítja lim formátumú fileokra.
 Azért lim formátumú fileokra, mivel a lim az egy környezetfüggetlen nyelv, és sokkal könnyebb ezen metrikákat mérni.
-A JSAN2Lim is egy alprojektje az Analyzer JavaScriptnek, és a JSANra épül.
-Emiatt fontos, hogyha a JSAN programot fejlesztik, akkor a JSAN2Lim-et is fejleszteni kell, mivel ha nem, akkor a metrikák nem fognak jól számolódni.
+A JSAN2Lim is egy alprojektje az Analyzer JavaScriptnek.
+Fontos, hogyha a JSAN programot fejlesztik, akkor a JSAN2Lim-et is fejleszteni kell, mivel ha nem, akkor a metrikák nem fognak jól számolódni.
 A JSAN2Lim használja a LimSchemat, ez is ugyanúgy egy $.vpp$ kiterjesztésű file.
 Más logikával van felépítve, mint a JavaScriptSchema, ezért nem is nagyon mennék bele az elemzésébe, csak csupán néhány dolgot fogok használni belőle.
 A JSAN2Lim visiteli az összes nodeot amit a JSAN outputba kirak, ezért JSAN2LimVisitor a fő file neve.
@@ -55,7 +55,7 @@ A createLimNode meghívja a limFactoryból a createNode-ot, ami vár paraméterb
 A nodeKindot a getLimKind függvény határozza meg a következők szerint.
 Megvizsgáljuk, hogy az adott node $getIsClassDeclarationBase()$ vagy $getIsMethodDefinition$ vagy $getIsFunctionDeclarationBase$ vagy sorolhatnám még. Ebből van 10-15db.
 Típustól szerint adjuk meg a nodeKindnak az értékeket, amik lehetnek a következők: ndkClass, ndkMethod, ndkParameter, ndkMethodCall, ndkAttribute, ndkComment, ndkPackage, ndkAttributeAccess, ndkComponent.
-Ezek mind a lim-nek az asgben való típusok és mindet letudja kezelni. Miután beállítottam a nodeKind értékét, szimplán returnolom.
+Ezek mind a lim-nek az asgben való típusok és mindet tudja kezelni. Miután beállítottam a nodeKind értékét, szimplán returnolom.
 Ha megkaptuk a nodeKind értékét, akkor ezt létrehozza a createLimNode függvény. Állít be ennek pozíciót és returnoli a *limNode-ot.
 
 \noindent
