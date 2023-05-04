@@ -10,7 +10,7 @@ A SchemaGenerator a JavaScriptSchemából és az ebből generált asgből gener�
 A SchemaGeneratornak több generálása is definiálva van, hiszen nem csak erre használják. Nekünk a NodeAddonGenerator.c fileban és a hozzátartozó header fileban van minden.
 A main.c-be ezt beincludeolja, és ennek hívja meg egyes metódusait, ami által elkészül a javascriptAddon.
 A következő pár oldalon bemutatnám, hogy a generálás hogyan zajlik.
-A SchemaGeneratornak rengeteg kapcsoloja van, köztük a generateNodeAddon is. Ezekre a kapcsolókra vizsgál egyesével, egy nagy if-elseben.
+A SchemaGeneratornak rengeteg kapcsolója van, köztük a generateNodeAddon is. Ezekre a kapcsolókra vizsgál egyesével, egy nagy if-elseben.
 \begin{lstlisting}[caption={SchemaGenerator kapcsoló vizsgálás},label={lst:schemagenerator_argv_genNodeAddon}, language={CStyle}]
 else if(!strcmp(argv[i], "-genNodeAddon")){
       options.generateNodeAddon = true;
@@ -40,7 +40,7 @@ if(options.generateNodeAddon ){
 \end{lstlisting}
 
 A createAndEnterDirectory metódus annyit csinál, hogy létrehoz egy mappát és chdirrel belelép. Ha az adott mappa már létezik, akkor csak szimplán belelép.
-A SOURCE NODE ADDON DIR NAME változó jelen esetben addon értéket fog kapni, hiszen a javascriptAddon dolgai ebbe fognak generálódni.
+A SOURCE $NODE\_ADDON\_DIR\_NAME$ változó jelen esetben addon értéket fog kapni, hiszen a javascriptAddon dolgai ebbe fognak generálódni.
 Miután létrehozta és/vagy belelépett az addon mappába először legenerálja a package.json filet a projekthez.
 A package.json fileban beállítja a projektnevét, verziószámát, dependencyket, scripteket és a végén a gypfile kapcsolónak egy true-t beállít.
 \begin{lstlisting}[caption={NodeAddonGenerator package.json scripts}, label={lst:nodeAddonGenerator_package_json}, language={CStyle}]
@@ -93,20 +93,21 @@ A generateFactoryWrapperben 2 metódus hivás található, a generateFactoryWrap
 
 A generateFactoryWrapperHeader a Factory.h filet generálta le a következőképp:
 Először beincludolja az összes nodeWrappernek a headerjét, és utána létrehoz egy Factory osztályt, publikus metódusait, ami Init és Destructor, illetve a private metódusait,
-ami a destructor, New, SaveAST, LoadAST, CLear, getRoot és az összes nodeWrapper create metódusa.
+ami a destructor, New, SaveAST, LoadAST, Clear, getRoot és az összes nodeWrapper create metódusa.
 Erre azért van szükség, mivel majd a JSAN-ban ezeket a wrappereket fogjuk létrehozni és szerkeszteni.
 
 \noindent
 
 A generateFactoryWrapperSource pedig a Factory.cc filet generálja le.
 Ebben a fileban pedig meg van az összes metódus valósítva, ami a headerjében található.
-Emellett a Factory Initjének a props változója a következőképp alakul:
+Emellett a Factory Initjének a props változója a következőképpen néz ki:
 \begin{lstlisting}[caption={Factory.cc file}, label={factory_cc}, language={CStyle}]
 napi_property_descriptor props [] = {
       DECLARE_NAPI_METHOD("getRoot", getRoot),
       DECLARE_NAPI_METHOD("createCommentWrapper", createCommentWrapper)
       ...}
 \end{lstlisting}
+
 DeclareNapiMethodokat hoz létre, az összes nodeWrappernek, ezek majd a JSAN-ban lesznek használatosak.
 
 \noindent
@@ -128,7 +129,7 @@ napi_property_descriptor props [] = {
 
 Látható \aref{lst:ExportAllDeclaration_header} kódrészleten, hogy létrehozott az ExportAllDeclarationWrappernek egy setPosition, addAssertions, setType és még több metódust.
 Ezek az ExportAllDeclaration attribútumai, amit a JavaScriptSchemában beállítottunk.
-\Aref{fig:declaration_vpp} látható, hogy az ExportAllDeclaration hasAssertions attribútumának a multiplicitása 1..*, ezt átkonvertálta addAssertionsre.
+\Aref{fig:declaration_vpp} ábrán látható, hogy az ExportAllDeclaration hasAssertions attribútumának a multiplicitása 1..*, ezt átkonvertálta addAssertionsre.
 Ahol 0..* a multiplicitás, azt átkonvertálta setAttribute-ra, pl setSource vagy setExportedre.
 Minden nodeWrappernek van olyan metódusa, hogy setPath, setPosition, setType, addComments, hiszen minden a BaseNode vagy a BaseTokenből öröklődik le.
 
