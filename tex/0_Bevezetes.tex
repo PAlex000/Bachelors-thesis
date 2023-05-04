@@ -3,37 +3,34 @@
 
 \noindent
 
-Szakdolgozatomban a JavaScript Analyzer Tool továbbfejlesztése a cél.
+Szakdolgozatomban a JavaScript Analyzer továbbfejlesztése a cél.
 A továbbfejlesztés arról szól, hogy a javascript mellett előtérbe jön a typescript is.
 Ezáltal a typescript fileokat és projekteket is elemezni kell.
-Ez azt eredményezi, hogy a Javascript Analyzer Toolt gyökerestül át kell írni, annak érdekében,
+Ez azt eredményezi, hogy a Javascript Analyzert gyökerestül át kell írni, annak érdekében,
 hogy JavaScriptet és TypeScriptet is tudjon egyaránt elemezni.
-
 
 \noindent
 
-A JavaScript Analyzer Tool az egy nagyobb projektnek az egyik alprojektje. Ezt a nagyobb projektet Analyzer-JavaScriptnek hívják.
+A JavaScript Analyzer az egy nagyobb projektnek az egyik alprojektje. Ezt a nagyobb projektet Analyzer-JavaScriptnek hívják.
 Az Analyzer-Javascriptnek több alprojektje is van, amiben sok minden egymásra épül.
-A szakdolgozatomban a következő alprojektekben fogok változtatni: JSAN, és az erre épülő JSAN2Lim.
+A szakdolgozatomban a következő alprojektekben fogok változtatni és bővíteni: JavaScriptSchema, JSAN (ezen belül is csak az astTransformerben), és az erre épülő JSAN2Lim.
 Emellett még megtalálhatóak a következő alprojektek is: ESLintRunner, ESLint2Graph, LIM2Metrics, LIM2Patterns, DuplicatedCodeFinder és a ChangeTracker.
 Azért kell a JSAN2Limben is változtatni, mivel ha gyökerestül megváltoztatom a JSAN-t,
 akkor a JSAN2Lim rossz eredményeket fog visszaadni a typescript fileok elemzése közben.
 
-
 \noindent
 
-A projekten amin fejlesztettem, azon többen is fejlesztettek egyszerre, ezáltal voltak átfedések, oszthatatlan részek.
-A projekt legtöbb része egymásra épül, ezért kiemelten fontos volt a csapatmunka egyes részeknél, hogy a projekt eredményesen és hatékonyan haladjon.
+A projekten amin fejlesztettem, többen is fejlesztettek egyszerre, ezáltal voltak átfedések, oszthatatlan részek.
+A projekt néhány része egymásra épül, ezért kiemelten fontos volt a csapatmunka egyes részeknél, hogy a projekt eredményesen és hatékonyan haladjon.
 Az eredményes csapatmunka magában foglalja az eredmények és az előrehaladás folyamatos kommunikálását,
 ami azt jelenti, hogy mindketten megértjük, hogy milyen célkitűzések vannak a projektben,
 és rendszeresen jelentést adunk egymásnak az elvégzett munkáról és az elért eredményekről.
 
-
 \noindent
 
-Fejlesztés során úgynevezett JavaScriptSchema.vpp file szerkesztése is csoportos munka volt, hiszen minden erre épült, ez volt az alapja mindennek.
-Sok időt vett igénybe a szerkesztés. Nulláról kellett kellett újraírni az egész vpp filet.
-Sajnos dokumentáció nem készült az előző filehoz, ezért nekünk kellett kitalálni, hogy mi mit csinált, hiszen akik ezt írták, ők már nem foglalkoztak ezzel.
+Fejlesztés során JavaScriptSchema file szerkesztése csoportos munka volt, hiszen minden erre épült, ez volt az alapja mindennek.
+Sok időt vett igénybe a szerkesztés. Nulláról kellett újraírni az egész vpp filet.
+Sajnos dokumentáció nem készült az előző filehoz, ezért nekünk kellett kitalálni, hogy mi mit csinált, hiszen akik ezt írták, ők már nem foglalkoztak ezzel és elérhetetlenek voltak.
 A szerkesztéshez szükséges volt a Visual Paradigm alkalmazást használni.
 Ezzel egyikőnk sem találkozott még, szóval először ezt kellett tanulmányozni, megérteni.
 Ezután értelmezni kellett a meglévő schemát, hiszen eddig az jól működött, csak nem lehetett könnyen bővíteni.
@@ -41,3 +38,18 @@ Mérlegeltük a két opciót, ahol vagy megpróbáljuk bővíteni a jelenlegi sc
 Végül az újraírás mellett döntöttünk, hiszen ezt láttuk gyorsabb és könnyebb megoldásnak. Egy könnyen bővíthető, dokumentál schema volt az elképzelés.
 Ketten fejlesztettük le végül ezt a schemát.
 
+\noindent
+
+Ezután változtattam a JSAN2Lim-et, hogy képes legyen értelmezni a JSAN outputjait a typescriptes elemzések során.
+Itt át kellett néznem a c++ programozási nyelvet, hiszen az egész program ebben íródott, ugyanúgy dokumentáció nélkül.
+Több nehézségbe is ütköztem, de a legvégén sikerült olyan állapotra hozni a programot, hogy az output nagy százalékát sikeresen átkonvertálja lim fileba.
+
+\noindent
+
+Ezután a JSANnak az astTransformer filejában a bindert optimalizáltam.
+Értelmezni kellett a kódot, át kellett néznem az ast-t, meg több adatszerkezetet is, gyorsasági szempontból.
+
+\noindent
+
+Legvégül pedig miután minden készen volt, bővítettem a regteszteket új projektek behozatalával, mind javascripteseket és typescripteseket.
+Ezeknek az outputjait megnéztem, hogy jó eredményt ad-e, itt még volt egy kis bugfixing a JSAN2Limben és a Schémában.
