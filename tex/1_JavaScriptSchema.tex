@@ -13,11 +13,11 @@ A felépítése a következőképpen alakul:
       \includegraphics[width=0.4\textwidth]{JavaScriptSchema_struktura.png}
 \end{figure}
 
-\Aref{fig:JavaScriptSchema_struktura} ábrán a következő struktúra figyelhető meg: ProjektNév-Model-Packagek.
+\Aref{fig:JavaScriptSchema_struktura} ábrán a következő struktúra figyelhető meg: ProjektNév/Model/Packagek.
 A projekt neve a JavaScript, ezen belül található egy model, amit javascript-nek hívnak. A modellen belül találhatóak meg a packagek.
 A Packagek nem véletlenül így lettek elnevezve. Az alábbi hivatkozáson található meg, hogy milyen logika alapján neveztük el a packageket:~\cite{typescript-eslint}
 Nem feltétlenül muszáj több packaget létrehozni, ez csupán az átláthatóság és a könnyen bővíthetőség céljából lett így megvalósítva.
-Követtük a typescript-eslint githubon lévő projekt struktúrális logikáját, több helyen is eltértünk tőle, mivel a mi projektünk másabb, illetve speciális megoldásokat igényelt egyes helyeken.
+Követtük a typescript-eslint githubon lévő projekt struktúrális logikáját, de több helyen is eltértünk tőle, mivel a mi projektünk másabb, illetve speciális megoldásokat igényelt egyes helyeken.
 A következő oldalakon bemutatom a packagek felépítését néhány egyszerűbb példán szemléltetve.
 A packagek a következőképpen épülnek fel:
 \begin{figure}[!htbp]
@@ -28,7 +28,7 @@ A packagek a következőképpen épülnek fel:
 
 \Aref{fig:base_vpp} ábrán különböző osztályok láthatóak. A Base osztály mindennek az alapja, ebből öröklődik minden más.
 Látható, hogy egy id attribútummal rendelkezik, aminek a típusa NodeId.
-A zöld háttérszínű osztályok az absztrakciót jelentik. Működésben nincs jelentősége, csak a schéma szerkeszthetősége és olvashatósága miatt van így jelezve.
+A zöld háttérszínű osztályok az absztrakciót jelentik. Az asg fileban jelentősége, illetve a schéma szerkeszthetősége és olvashatósága miatt van így jelezve.
 A szürke háttérszínű osztályok pedig csupán annyit jelentenek, hogy más packageben lettek definiálva.
 A kék a default, normális osztályt jelölik.
 A Positioned és a System származik le a Baseből, értelemszerűen a system az maga a program lesz.
@@ -50,6 +50,7 @@ A base package nem követi a typescript-eslint githubon lévő projekt base mapp
 A base packagen kívül bemutatom a declaration packaget, hogy lássuk milyen logikát követtünk a megírás során.
 Ezen belül is az ExportAllDeclaration bemutatása:
 
+\Aref{lst:ExportAllDeclaration} kódrészlet így lett megvalósítva a JavaScriptSchémában:
 \begin{lstlisting}[caption={ExportAllDeclaration typescriptes megvalósítása},label={lst:ExportAllDeclaration}, language={JavaScript}]
 export interface ExportAllDeclaration extends BaseNode {
       type: AST_NODE_TYPES.ExportAllDeclaration;
@@ -60,12 +61,10 @@ export interface ExportAllDeclaration extends BaseNode {
 }
 \end{lstlisting}
 
-\Aref{lst:ExportAllDeclaration} kódrészlet így lett megvalósítva a JavaScriptSchémában:
-
 \begin{figure}[!htbp]
       \caption{A declaration package felépítése}\label{fig:declaration_vpp}
       \centering
-      \includegraphics[width=1\textwidth]{declaration.png}
+      \includegraphics[width=0.8\textwidth]{declaration.png}
 \end{figure}
 
 \Aref{fig:declaration_vpp} ábrán látható az, hogy minden a BaseNodeból származik. \Aref{lst:ExportAllDeclaration} kódrészletben ez az extends BaseNode.
@@ -73,7 +72,7 @@ Itt maga a declaration osztály az a DeclarationStatement névre hallgat, csupá
 Jobb oldalt a sötétszürke és a világosszürke osztályok azok az attribútumok.
 Ebben az esetben az ExportAllDeclaration osztály leimplementálását mutatom be a JavaScriptSchemában.
 Az ExportAllDeclaration öröklődik a Statement, DeclarationStatement, Node és a ProgramStatementből.
-Ezeket az öröklődéseket ugyanúgy a typescript-eslint githubról néztük, unions mappában érhetőek el.
+Ezeket az öröklődéseket ugyanúgy a typescript-eslint githubról néztük, unions mappában találhatóak el.
 Ezáltal megkapja az összes szülőnek a tulajdonságait. A DeclarationStatement öröklődik a BaseNodeból, ami azt jelenti, hogy a BaseNode tulajdonságait is megkapja az ExportAllDeclaration.
 A BaseNode ugye meg származik a Positionedből, ez látható \aref{fig:base_vpp} ábrán.
 Emiatt az ExportAllDeclaration-nek lesz pozíciója, kommentje és NodeId-ja is.
@@ -90,12 +89,12 @@ Vannak úgynevezett gyűjtő osztályok is, mint pl a Statement, ezekre azért v
 
 \noindent
 
-Sokat említettem a DataStructurest. Hadd mutassam be egy példán keresztül, hogy ez hogy néz ki:
+Sokat említettem a DataStructurest. Hadd mutassam be egy példán keresztül, hogy ez hogy néz ki.
 
 \begin{figure}[!htbp]
       \caption{A DataStructures packageben a Kind package felépítése}\label{fig:data_structures_kinds}
       \centering
-      \includegraphics[width=0.6\textwidth]{data_structures.png}
+      \includegraphics[width=0.8\textwidth]{data_structures.png}
 \end{figure}
 
 A DataStructures packageben található 2 package, ez \aref{fig:JavaScriptSchema_struktura} ábrán látható. Ebből a Kinds packaget mutatom be.
@@ -110,12 +109,10 @@ A JavaScriptSchema magában még semmit sem csinál. Először ki kell exportál
 Ezután az xml filet átkonvertáljuk egy asg filera. Ez úgy történik, hogy a JavaScript Analyzer projektnek van egy kisebb alprojektje, amit UmlToAsg-nek hívnak.
 Ez a java kód átkonvertálja az xml fileban lévő adatot egy asg fileba. Jobban nem térnék ki az UmlToAsg projektre, mivel nem szerkesztettük.
 Az UmlToAsg projektet a SchemaGenerator generálta le. A SchemaGenerator c++ nyelven megírt program. Több mindent is generál c, c++, vagy java nyelven.
-Ez a projekt is a JavaScript Analyzer alprojektei közé tartozik.
-A legenerált asg file a következőképp néz ki:
+Ez a projekt is az Analyzer JavaScript  alprojektei közé tartozik.
 A file elején a következő található meg:
 \begin{lstlisting}[caption={Asg file első sorai},label={lst:asg_file_eleje}, language={JavaScript}]
 NAME = javascript;
-
 APIVERSION = 0.3.1;
 BINARYVERSION = 0.3.1;
 CSIHEADERTEXT = JavaScriptLanguage;
@@ -158,8 +155,8 @@ Ha 1es, akkor a multiplicitás 0..1, ha *, akkor vagy 0..* vagy 1..* a multiplic
 
 \noindent
 
-A JavaScript Analyzer a JavaScriptSchemára épül. Ha valamit meg akarunk változtatni gyökerestül a JavaScript Analyzerbe, akkor a schémát is változtatni kell.
-Azt elérni, hogy javascript mellett még typescriptes kódokat is elemezzen a JavaScript Analyzer, ahhoz gyökerestül meg kellett változtatni a JavaScript Analyzert.
+A JSAN a JavaScriptSchemára épül. Ha valamit meg akarunk változtatni gyökerestül a JSANba, akkor a schémát is változtatni kell.
+Azt elérni, hogy javascript mellett még typescriptes kódokat is elemezzen a JSAN, ahhoz gyökerestül meg kellett változtatni a JavaScript Analyzert.
 Az előző JavaScriptSchema (ami csak javascriptet elemzett) az a javascript hivatalos oldala alapján készült. Ami ábrák fentebb megtalálhatóak, azok már az átírt schémából vannak.
 Több opció is volt, hogy most vagy legyen átírva a schéma, vagy legyen egy külön typescriptre is írva.
 Végül rájöttünk, hogy ha van egy typescriptes schémánk, az képes javascriptet ugyanúgy elemezni ha megfelelően van lefejlesztve.
