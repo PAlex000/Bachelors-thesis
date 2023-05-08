@@ -1,6 +1,7 @@
-\chapter{JavaScriptSchema átírása}\label{chap:JavaScriptSchema átírása}
+\chapter{Oszthatlan közösen készített programok}\label{chap:oszthatlan_kozos_dolgok}
 
-\section{A JavaScriptSchemáról}
+
+\section{A nyelvi séma}
 
 \noindent
 
@@ -151,7 +152,7 @@ Minden mást EDGE TREE-nek nevezett el. Az Edge tree utáni szám vagy csillag a
 Ha 1es, akkor a multiplicitás 0..1, ha *, akkor vagy 0..* vagy 1..* a multiplicitás.
 \Aref{fig:declaration_vpp}as ábrán látható, hogy mit hogyan írt át.
 
-\section{JavaScriptSchema átírása}
+\section{A nyelvi séma átírása}
 
 \noindent
 
@@ -223,3 +224,5 @@ Végül még az volt a nehézség, hogy kódrészletet keressünk az analyzernek
 Mivel nem nagyon volt typescriptes háttértudásunk, először a typescriptet kellett átnézni, hogy mit hogyan tudunk megvalósítani.
 Emellett még a javascriptes outputokat is át kellett nézni, mivel a mi célunk a fejlesztés volt. A jelenlegi javascriptes projektekre ugyanolyan eredményt adott, sőt néhány helyen jobbat is, mert az előző schémában is voltak pontatlanságok.
 A typescriptes projektek nagy részét tudja elemezni az analyzer, de közel sem tökéletes, mivel egyfolytában kellene fejleszteni a schémát, mivel a typescript nem annyira régi.
+
+
