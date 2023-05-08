@@ -1,1 +1,65 @@
-\chapter{SourceMeter bevezetés}\label{chap:SourceMeter_bevezetes}
+\chapter{SourceMeter}\label{chap:SourceMeter}
+
+\section{SourceMeter bevezetés}
+
+\noindent
+
+A SourceMeter egy forráskód-elemző eszköz, amely képes mély statikus programelemzést végezni a C, C++, Java, Python, C\#, JavaScript, TypeScript és RPG (AS/400)$^{~\cite{szHoke2014case}}$
+nyelvű összetett programok forráskódján.
+A FrontEndART a Szegedi Tudományegyetem Szoftverfejlesztés Tanszékén kutatott és fejlesztett Columbus technológián$^{~\cite{beszedes2005columbus}}$ alapuló SourceMeter eszközt fejlesztette ki.
+A statikus kódelemzés egy olyan módszer, amely során a program forráskódját elemezzük, anélkül hogy azt ténylegesen futtatnánk.
+Az elemzés során különböző eszközök segítségével ellenőrizhetjük a kód helyességét, hatékonyságát, biztonságosságát és karbantarthatóságát.
+Az ilyen típusú elemzés során gyakran felhasználnak különböző szabályokat és előírásokat, amelyek segítenek az azonosításban és a hibák javításában.
+
+\noindent
+
+A statikus elemzés során absztrakt szemantikus gráf (ASG) készül a forráskód nyelvi elemeiből.
+Ezután az ASG-t különböző eszközökkel dolgozzák fel a csomagban annak érdekében, hogy kiszámítsák a metrikákat (LLOC$^{~\cite{siket2014differences}}$, NLE vagy NOA),
+azonosítsák az ismételt kódrészleteket (másolás-beszúrás; klónok), a kódolási szabályszegéseket, stb.
+A SourceMeter képes elemzést végezni olyan forráskódon,amely megfelel a Java 8 és korábbi verzióinak, a C/C++,
+az RPG III és az RPG IV verzióinak (beleértve a szabadon formázottakat), a C\# 6.0 és korábbi verzióinak, valamint a Python 2.7.8 és korábbi verzióinak.
+A C/C++ esetében a SourceMeter támogatja az ISO/IEC 14882:2011$^{~\cite{sourcemeter2015}}$ nemzetközi szabványt, amelyet kiegészítettek az ISO/IEC 14882:2014 új funkcióival, és a C nyelvet az ANSI/ISO 9899:1990, az ISO/IEC 9899:1999 és az ISO/IEC 9899:2011 szabványok határozzák meg.
+Az alapértelmezett funkciókon túl, a GCC és a Microsoft által meghatározott kiterjesztések is támogatottak.
+
+\noindent
+
+A SourceMeter a QualityGate eszközben van használva. \todoi{Képeket betenni}
+
+\noindent
+
+A SourceMeternek található egy plug-in a SonarQubehoz.
+A SourceMeter plug-in a SonarQube platformhoz egy kiterjesztése az nyílt forráskódú SonarQube platformnak, amelyet a kód minőségének kezelésére használnak
+A plug-in a SourceMeter-t futtatja a SonarQube platformról, és feltölti a forráskód elemzésének eredményeit a SourceMeter-től a SonarQube adatbázisába.
+A plug-in nyílt forráskódú, és az összes szokásos SonarQube kódelemzési eredményt biztosítja, kiegészítve sok további metrikával és problémakeresővel, amelyeket a SourceMeter eszköz biztosít.
+A plug-in támogatja a C/C++, a Java, a C\#, a Python és a RPG nyelveket.$^{~\cite{ferenc2014source}}$
+
+\section{SourceMeter for JavaScript}
+
+\noindent
+
+A SourceMeter for JavaScript a SourceMeternek egy nagyobb alprojektje.
+A SourceMeter for JavaScript egy olyan eszköz, amely lehetővé teszi a mély statikus forráskód elemzést a bonyolult JavaScript és TypeScript rendszerekben.
+Képes felismerni a kód hibáit, mint például a nem definiált változók vagy függvények használata, a nem biztonságos kódrészletek, a nem hatékony kódrészletek, valamint a redundáns és ismétlődő kódok.
+Ezenkívül az eszköz képes összehasonlítani a kódot az általános gyakorlatokkal és a meghatározott szabályokkal, és jelezni az eltéréseket.
+Az ilyen eszközök használata segíthet az észlelt hibák javításában és a kód minőségének javításában, ami végső soron javíthatja a rendszer biztonságát és hatékonyságát.
+
+\noindent
+
+A SourceMeter for JavaScript projekt több alprojektet is magába foglal, amelyek különböző részfeladatokra specializálódnak.
+
+\subsection{Nyelvi séma bevezetés}\label{chap:nyelvi_sema}
+% Sajnos dokumentáció nem készült az előző filehoz, ezért nekünk kellett kitalálni, hogy mi mit csinált, hiszen akik ezt írták, ők már nem foglalkoztak ezzel és elérhetetlenek voltak.
+% A szerkesztéshez szükséges volt a Visual Paradigm alkalmazást használni.
+% Ezzel egyikőnk sem találkozott még, szóval először ezt kellett tanulmányozni, megérteni.
+% Ezután értelmezni kellett a meglévő schemát, hiszen eddig az jól működött, csak nem lehetett könnyen bővíteni.
+% Mérlegeltük a két opciót, ahol vagy megpróbáljuk bővíteni a jelenlegi schémát, vagy nulláról elkezdjük újraírni.
+% Végül az újraírás mellett döntöttünk, hiszen ezt láttuk gyorsabb és könnyebb megoldásnak. Egy könnyen bővíthető, dokumentál schema volt az elképzelés.
+% Ketten fejlesztettük le végül ezt a schemát.
+
+\subsection{JavaScriptAddon bevezetés}
+
+\subsection{JSAN bevezetés}
+
+\subsection{JSAN2Lim bevezetés}
+
+\subsection{Regressziós tesztelés bevezetés}
