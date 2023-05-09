@@ -199,7 +199,7 @@ SCOPE declaration {
 \end{lstlisting}
 
 Az UmlToAsg minden egyes package-et Scope-nak értelmez.
-A Scope-on belül az osztályokat node-nak értelmezi.
+A Scope-on belül az osztályokat gráf csomópontnak (továbbiakban: node) értelmezi.
 A node-nak kettő különféle attribútuma lehet, ATTR és EDGE TREE.
 Akkor konvertálja ATTR-ra az attribútumot, ha az a DataStructures package-ben deklarálva lett. Egyéb esetben EDGE TREE-vé konvertál.
 Az EDGE TREE után álló szám vagy csillag, az adott attribútum multiplicitását jelenti.
@@ -290,7 +290,7 @@ return true;
 
 Ha a jelenlegi node absztrakt, akkor nem ír semmit a fáljba.
 Ha nem absztrakt, akkor \aref{lst:addoncc_wrapper_includes_implementation} kódrészlet alapján importálja a node-nak a header fájl relatív útvonalát.
-A $node->name$ több értéket is vehet fel, például FunctionDeclaration, ClassDeclaration, ezek megtalálhatóak az asg fájlban.
+A \texttt{node->name} több értéket is vehet fel, például FunctionDeclaration, ClassDeclaration, ezek megtalálhatóak az asg fájlban.
 Ezután ez a bejárás még egy alkalommal végrehajtódik. Ebben az esetben a wrapperIniteket ír az addonCC fájlba.
 
 \begin{lstlisting}[caption={generateWrapInit leimplementálása}, label={lst:addoncc_wrapper_inits_implementation}, language={CStyle}]
@@ -352,5 +352,73 @@ Az ExportAllDeclaration.cc fájlt ugyanúgy generálja le, mint a Factory.cc fá
 Ezután az összes metódust megvalósításra kerül.
 
 \subsection{JSAN2Lim bevezetés}
+
+\noindent
+
+A JSAN2Lim C++ programozási nyelvben megírt program. A JSAN általi eredményt alakítja át nyelvfüggetlen (továbbiakban: LIM) formátumú fájlokra.
+Azért LIM formátumú fájlokra alakít át, mivel egy nyelvfüggetlen modellen sokkal könnyebb metrikákat mérni.
+A JSAN2Lim függ a JSAN programtól, hiszen a JSAN eredményeit alakítja át, tehát, ha a JSAN programot változás éri, akkor a JSAN2Lim programot is változtatni kell, különben nem lesznek pontosak a metrika mérések.
+A JSAN2Lim használja a LimSchema-t. A LimSchema hasonlóan van felépítve, mint a JavaScript nyelvi sémája.
+A JSAN2Lim bejárja az összes node-ot ami megtalálható a JSAN általi eredmény fájlban.
+Minden node-ra külön meg kell írni a bejáró (továbbiakban: visit) függvényt.
+
+\noindent
+
+A JSAN2Lim működését egy kódrészleten keresztül mutatom be.
+\begin{lstlisting}[caption={ClassDeclaration Visitor}, label={lst:classdeclaration_visitor}, language={CStyle}]
+VISIT_BEGIN(clNode, callVirtualBase);
+lim::asg::logical::Class& classLimNode = dynamic_cast<lim::asg::logical::Class&>(createLimNode(clNode, callVirtualBase));
+fillData(classLimNode, clNode);//sets the name
+fillMemberData(classLimNode);
+demangledNameParts.push_back(classLimNode.getName());
+classStack.push(ClassInfo());
+classStack.top().classNodeId = classLimNode.getId();
+if (clNode.getSuperClass() != NULL) {
+      if (javascript::asg::Common::getIsIdentifier(*clNode.getSuperClass())) {
+            javascript::asg::expression::Identifier& superClass = dynamic_cast<javascript::asg::expression::Identifier&>(*clNode.getSuperClass());
+            classStack.top().isSubclass = superClass.getId();}}
+if (!packageStack.empty()) {
+      lim::asg::logical::Package& packageLimNode = dynamic_cast<lim::asg::logical::Package&>(limFactory.getRef(packageStack.top().packageNodeId));
+      SAFE_EDGE(packageLimNode, Member, lim::asg::logical::Member, classLimNode.getId());}
+addIsContainedInEdge(classLimNode, clNode);
+\end{lstlisting}
+
+A VISIT\_BEGIN a ViscitorAbstractNodes programnak a visit metódusa.
+Ezután létrejön a classLimNode változó, ami \texttt{lim::asg::logical::Class\&} típusú.
+Ez a típus a LimSchema-ban található meg, a logical package-ben.
+A változónak a createLimNode metódus által visszaadott node lesz az értéke.
+Ezt az értéket konvertáljuk át a erre a \texttt{lim::asg::logical::Class\&} típusra.
+
+\noindent
+
+A createLimNode függvény meghívja a createNode függvényt. Ez a függvény vár paraméterbe egy nodeKind-ot.
+A nodeKind az adott node típúsát jelöli.
+A nodeKind-ot a getLimKind függvény határozza meg.
+A getLimKind függvény megvizsgálja, hogy az adott node \texttt{getIsClassDeclarationBase} vagy \texttt{getIsMethodDefinition} vagy \texttt{getIsFunctionDeclarationBase}.
+A nodeKind értéke típustól függően adódik meg.
+Ezek az értékek a következők lehetnek: ndkClass, ndkMethod, ndkParameter, ndkMethodCall, ndkAttribute, ndkComment, ndkPackage, ndkAttributeAccess, ndkComponent.
+Ezek az értékek mind a LimSchema-ban vannak deklarálva. A nodeKind értékadása után a függvény visszaadja ezt a változót és tovább használja a visitor-ban.
+Ezután, a createLimNode függvény létrehozza a megfelelő node-ot a nodeKind-tól függően. Beállítja a pozícióját a node-nak és visszaadja a *limNode-ot.
+
+\noindent
+
+Ebben az esetben a nodeKind az ndkClass értéket kapja meg.
+A classLimNode értékadás után meghívódik a filldata függvény.
+Kettő paramétert vár, classLimNode-ot, és a node-ot.
+A filldata a JSAN általi adott eredményet bejárja, visitorok segítségével.
+A filldata-ban beállítódik a limnode láthatósága, nyelve, az hogy absztrakt-e és a classKind-ja, ami jelen esetben clkClass értéket fog felvenni.
+
+Ezután beállítódik a limnode neve. Ha a node-nak volt identifier-e, akkor a \texttt{getName} függvénnyel beállítódik a limnode neve különben \texttt{anonymousClass} érték állítódik be.
+Ezután megvizsgálja, hogy a methodstack (ami egy stack és metódusokat tartalma) üres-e.
+Ha nem üres, akkor létezik szülője, ezért a SAFE\_EDGE metódussal hozzáadódik egy csúcs a szülő és a jelenlegi limnode között.
+Ezt uganúgy megvizsgálja a  packageStack-re (ami egy stack és csomagokat tartalmaz), ha nem üres, akkor ugyanezt elvégzem csak a szülő más lesz.
+Legvégül az \texttt{addIsContainedInEdge} függvény meghívódik a limnode és a jsNode paraméterekkel.
+
+\noindent
+
+Ezután a \texttt{fillMemberData} függvény hívódik meg.
+Ez a függvény a limnode pozícióját állítja be, és a nevén változtat.
+Utána a classStack-hez hozzáadódik az adott osztály tulajdonságai, beállítja a szülő osztályt ha van, a pozícióját is beállítja, és a végén meghívódik az \texttt{addIsContainedInEdge} a classLimNode és a clNode paraméterekkel.
+Minden egyes node-nál ez az eljárás fut le.
 
 \subsection{Regressziós tesztelés bevezetés}
