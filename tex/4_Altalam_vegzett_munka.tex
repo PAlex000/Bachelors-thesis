@@ -86,7 +86,7 @@ A \texttt{node} is egy objektum ami maga az Identifier vagy PrivateIdentifier.
 
 \subsection{Lassúság okai}
 
-Binder-nek a futási ideje lényegesen megnő, ha nagyonn projektekre futtatjuk le.
+Binder-nek a futásideje lényegesen megnő, ha nagyonn projektekre futtatjuk le.
 Ennek több oka is van:
 
 \begin{itemize}
@@ -102,31 +102,28 @@ Ennek több oka is van:
 
 \noindent
 
-Először ki kellett derítenem, pontosan melyik funkció mennyi memóriát vesz igénybe és milyen gyorsan fut le.
-Erre találtam egy javascript profilert, ami kiírta minden függvényhívásnál a lefoglalt memóriát és a memória használatot.
-Ez nekem nem volt a legjobb, mivel nagyon egybe van ágyazva minden, és eléggé mélyre mentek a functionok.
-Ezután próbáltam picit egyszerűbbet, a binder kódját 3 részre osztani, ${console.time()}$ és ${console.timeEnd()}$ használatával.
-Ez a ${console.time()}$ parancs kiírja nekem ms-ben, hogy mennyi idő telt el amíg eljutott a ${console.timeEnd()}$ig.
-Így megkaptam, hogy melyik rész nagyjából mennyi idő alatt fut le, könnyebb volt szűkíteni, hogy melyik function lesz a bajos.
-Végül kiderült, hogy a következő sor lassítja be nagyon a programot:
+Optimalizálás során először a JavaScript Profiler-t használtam memória és futásidő vizsgálatra.
+Nekem ez nem felelt meg, mivel a JavaScriptAddon-ban rengeteg minden egymásra épül, és 50-100 mélységű függvényhívásnál nem tudta kiírni a futásidejét és a memórihasználatot.
+Ezután a binder metódust 3 részre bontottam \texttt{console.time} és \texttt{console.timeEnd} beépített függvénnyek segítségével.
+Futásidőt írta ki a függvény a \texttt{console.time} és a \texttt{console.timeEnd} sorok között milliszekundumban.
+Kiderült, hogy a következő sor felettébb nagy futási idővel rendelkezik:
 
-\begin{lstlisting}[caption={Problémás function}, label={lst:binder_problemas_function}, language={JavaScript}]
-globals.getWrapperOfNode(resolveNode(astSet, sourceFile, element.source.range.start, element.source.range.end, true));
+\begin{lstlisting}[caption={Lassú metódus}, label={lst:binder_problemas_function}, language={JavaScript}]
+getWrapperOfNode(resolveNode(astSet, sourceFile, element.source.range.start, element.source.range.end, true));
 \end{lstlisting}
 
-Ezen belül is a resolveNode function volt a probléma.
-A resolveNode kapott egy ast-t (amit a binder kapott meg paraméterbe), egy filenevet, kezdő- és végPozíciót, illetve egy true vagy false értéket, ami attól függ, hogy sourcenodeot vagy targetnodeot keresünk.
-Az ast-n forEach-el végigmentünk, amin belül az astNodeon walkoltunk addig amíg nem találtuk meg a számunkra megfelelő nodeot.
-Rosszabb esetben a legvégén volt a node, mivel már a végén voltunk a bindolásnak, és ebből is látható volt, hogy ez kellően sok időbe is kerülhet, ha rengeteg nodeunk van.
-Kisebb projekt esetében ez nem baj, mivel az ast abban az esetben nem annyira nagy.
-Ahol már van 100 vagy 200 ezer változó és vagy függvényhívás, ott már nagyobb a baj, mivel ezt rengetegszer meg kell ismételni.
-Ezután ötleteltem, hogy hogyan tudnám jobbra átírni a resolveNodeot functiont, vagy egy másik logika alapján megközelíteni a problémát.
-Végül eszembe jutott egy sokkal könnyebb megoldás erre, ami nem igényli a sokszori bejárását az astnek.
+A resolveNode metódus első paraméterként vár egy AST-t, utána egy fájlnevet, kezdő- és végPozíciót, illetve egy igaz vagy hamis értéket.
+
+Az AST-t forEach-el bejárja a program. Az AST egyes elemei az AST node-ok.
+A forEach-en belül az AST node-on walk metódus segítségével bejártuk, addig amíg nem találtuk meg a keresett node-ot.
+Rosszabb esetben az AST legvégén volt a keresett node, mivel már a végén voltunk a bindolásnak.
+Kisebb projektek esetén ez nem baj, mivel az AST mérete nem akkora, mint egy nagyobb projekt esetében.
+
 \noindent
 
-Először is, létrehoztam egy indexAST nevű functiont, ami a következőket hajtja végre:
+Optimalizálás során, létrehoztam indexAST metódust, ami indexeli az AST-t.
 
-\begin{lstlisting}[caption={indexAST function}, label={lst:indexAST_function}, language={JavaScript}]
+\begin{lstlisting}[caption={indexAST metódus}, label={lst:indexAST_function}, language={JavaScript}]
 let indexAST = function (ast) {
       ast.forEach(astNode =>{
             globals.setActualFile(astNode.filename)
@@ -136,12 +133,15 @@ let indexAST = function (ast) {
       return globals.indexedAST}
 \end{lstlisting}
 
-\Aref{lst:indexAST_function} kódrészletben látható, hogy egy ast-t várunk paraméterben. Ezt a bindertől fogja kapni, ez az egyénilég létrehozott ast.
-A functionben forEach-el végig megyünk az ast elemein, amik az astNodeok. Itt beállítjuk a ${globals.setActualFile()}$ függvénnyel az aktuális filenevet.
-Ezután az adott astNode-on elkezdünk walkolni. Csak az enter metódusát írtam meg. Meghívunk egy függvényt ami a globalsban lett definiálva, setIndexed a neve.
-Ennek a függvénynek megadjuk a filevenet, a node rangenek a kezdő- és a végparaméterét (tehát ahol kezdődik az adott node és hol végződik, karakterpontosan), és magát a nodeot.
+\Aref{lst:indexAST_function} kódrészletben látható, hogy egy AST-t várunk paraméterben. Ezt a bindertől fogja kapni.
+A metódusban forEach-el bejárjuk az AST elemeit, amik az AST node-ok.
+Beállítom a \texttt{globals.setActualFile()} függvénnyel az aktuális fájlnevet.
+Ezután az adott AST node-ot walk függvény segítségével bejárjuk.
+Csak az enter metódusát kellett szerkeszteni.
+Ezután a setIndexed metódus meghívódik.
+A setIndexed függvénynek megkapja a fájlnevet, a node range-nek a kezdő- és a végparaméterét, ahol kezdődik az adott node és hol végződik, karakterpontosan, és magát a node-ot.
 
-\begin{lstlisting}[caption={setIndexed function}, label={lst:setIndexed_function}, language={JavaScript}]
+\begin{lstlisting}[caption={setIndexed metódus}, label={lst:setIndexed_function}, language={JavaScript}]
 const setIndexed = function(filename, range_start, range_end, node){
       let actualfilename = getFilePathAlt(filename)
       if (indexedAST[actualfilename + "-" + range_start + "-" + range_end] !== undefined && indexedAST[actualfilename + "-" + range_start + "-" + range_end] !== node){
@@ -151,17 +151,23 @@ const setIndexed = function(filename, range_start, range_end, node){
 }
 \end{lstlisting}
 
-A setIndexed először végez egy vizsgálatot arra, hogy az adott node be van már indexelve.
-Ezt úgy teszi meg, hogy az indexedAST tömbben keres egy indexre (Ez az index a következőképp néz ki: fileNev-StartPosition-Endposition), és még vizsgál is arra, hogy ha van ilyen index, akkor ezen van emár olyan node.
-Ha van akkor nem állít be semmit, csak returnol, mivel már be van indexelve az adott node. Ha nincs, akkor beállítja az indexedAST tömbnek az adott indexre az adott nodeot.
+A setIndexed először vizsgál arra, hogy az adott node be van-e már indexelve.
+Ezt úgy teszi meg, hogy az indexedAST tömbben keres egy indexre.
+Ez az index a következőképp néz ki: FájlNév-KezdőPozíció-VégPozíció.
+Továbbá vizsgál arra is, hogy ha van ilyen indexű elem a tömbben, akkor ezen az indexen található-e már ilyen node.
+Ha van akkor nem állít be semmit, csak kilép, mivel már be van indexelve az adott node. Ha nincs, akkor beállítja az indexedAST tömbnek az adott indexre az adott node-ot.
+Az AST-t csak egyszer járjuk be a foreach-el. A bejárás után minden node be lesz indexelve a tömbbe.
 
 \noindent
 
-Ezáltal az adott astn csupán csak egyszer megyünk végig foreach-el és egyszer walkolunk, ekkor egy tömbbe beindelexünk minden egyes létező nodeot ami kellhet nekünk.
-Ha ezzel megvoltunk akkor utána kezdődhet a binder része.
-\Aref{lst:binder_problemas_function} látható, hogy először megkerestük a nodeot index alapján és aztán hívtuk meg rá a ${getWrapperOfNode()}$ függvényt.
-Ezt is megváltoztattam, írtam rá egy getIndexed függvényt.
-A ${getIndexed()}$ függvény megvizsgálja, hogy source vagy targetNodeot keresünk. Ha targetNodeot, akkor returnoljuk a ${getWrapperOfNode(indexedAST[filename-StartPosition-Endposition])}$-t.
-Ha targetNodeot keresünk, akkor walkolunk ismét, de nem az ast-ben, hanem már a beindexelt tömbben.
-Ez lényegesen gyorsabb, mint a resolveNodeos megoldás, mert ott minden egyes esetben az ast-n walkoltunk, itt meg csak egy beindexelt elemén a tömbnek.
-Ha megkaptuk a sourceNodeot akkor returnoljuk a ${getWrapperOfNode(result)}$t.
+\Aref{lst:binder_problemas_function} kódrészleten látható, hogy először a resolveNode függvény segítségével megkerestük a keresett node-ot kezdő- és végPozíció alapján.
+Ezután a megkapott node-ra meghívtuk a \texttt{getWrapperOfNode} függvényt, hogy megkapjuk a wrapperjét a JavaScriptAddon-ból.
+A keresést megváltoztattam, írtam rá egy getIndexed metódust.
+
+\noindent
+\todoi{Source vagy target Nodeot fordítsd le}
+A \texttt{getIndexed} függvény megvizsgálja, hogy source vagy target node-ot keresünk.
+Ha target node-ot, akkor visszaadjuk a \texttt{getWrapperOfNode(indexedAST[FájlNév-KezdőPozíció-VégPozíció])}-t.
+Ha source node-ot keresünk, akkor a walk függvény segítségével bejárjuk a beindexelt tömböt.
+Ez lényegesen gyorsabb, mint a resolveNode-os megoldás, mert ott minden egyes esetben az egész AST-t bejártuk a walk függvény segítségével, jelen esetben csak a beindexelt tömb elemét járjuk be.
+Ha megkaptuk a source node-ot akkor visszaadjuk azt a \texttt{getWrapperOfNode(result)} hívással.
