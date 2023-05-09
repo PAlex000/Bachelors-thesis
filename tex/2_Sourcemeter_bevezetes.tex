@@ -48,6 +48,166 @@ Az ilyen eszközök használata segíthet az észlelt hibák javításában és 
 A SourceMeter for JavaScript projekt több alprojektet is magába foglal, amelyek különböző részfeladatokra specializálódnak.
 
 \subsection{Nyelvi séma bevezetés}\label{chap:nyelvi_sema}
+
+A JavaScript nyelvi séma(továbbiakban: séma) egy UML Diagramhoz hasonlító séma.
+A Visual Paradigm(továbbiakban: vpp) alkalmazással szerkeszthető.
+Azért szerkesztjük a sémát vpp-ben, mivel a többi nyelvi változat esetében is így volt, és van koncerter, ami ebből a vpp fájlból létrehozza a C++ alap fájlokat, amiket az elemző programok tudnak használni.
+A felépítése a következőképpen néz ki:
+
+\begin{figure}[!htbp]
+      \caption{Séma struktúrális felépítése}\label{fig:JavaScriptSchema_struktura}
+      \centering
+      \includegraphics[width=0.4\textwidth]{JavaScriptSchema_struktura.png}
+\end{figure}
+
+\Aref{fig:JavaScriptSchema_struktura} ábrán a ProjektNlv/Model/Package-ek struktúra figyelhető meg.
+A projekt neve JavaScript, ezen belül található egy model, amit javascript-nek hívnak.
+A modellen belül találhatóak meg a package-ek.
+A Package-ek a TypeScript séma $^{~\cite{typescript-eslint}}$ alapján lettek elnevezve.
+Átláthatóság és könnyebb bővíthetőség szempontjából lett létrehozva több package.
+Követtük a TypeScript-eslint$^{~\cite{typescript-eslint}}$ projekt struktúrális felépítését.
+A package-ek a következőképpen épülnek fel:
+\begin{figure}[!htbp]
+      \caption{A base package felépítése}\label{fig:base_vpp}
+      \centering
+      \includegraphics[width=0.9\textwidth]{base_vpp.png}
+\end{figure}
+
+\Aref{fig:base_vpp} ábrán a Base, Node, Positioned, Comment, System, Named, BaseNode, BaseToken, Program, ProgramStatement és a Token osztályok találhatóak.
+A Base osztályból öröklődik minden osztály.
+A Base osztály rendelkezik id attribútummal, ami NodeId típusú.
+Az absztrakciót zöld háttérszínnel jelöltük.
+A séma könnyebb bővíthetősége és olvashatósága miatt jeleztük így, illetve más nyelvi sémákban is ezt a logikát követjük.
+Más package-ekben lévő definiálást szürke háttérszínnel, ugyanabban a package-ben lévő definiálást világosszürke háttérszínnel jelöltük.
+Az alapértelmezett osztályt kék háttérszínnel jelöltük.
+A Positioned osztályból öröklődnek a Named, BaseNode és a BaseToken osztályok.
+A BaseNode osztályból több minden öröklődik, mint például a DeclarationStatement, ImportDeclaration, Expression és több minden is. Ez látható \aref{fig:declaration_vpp} ábrán.
+A Positioned osztály rendelkezik position attribútummal, ami Range típusú. A Positioned osztályhoz tartozhatnak kommentek is.
+A Comment osztály öröklődik a Positioned osztályból, ezzel biztosítva azt, hogy minden kommentnek lesz pozíciója.
+A Comment osztály rendelkezik text, type és location attribútummal.
+A CommentType és a CommentLocation a DataStructures package-ben lett definiálva.
+Végül, Program osztály öröklődik a Named osztályból, ezáltal rendelkezik name attribútummal, ami string típusú.
+Minden Program osztályhoz tartozik legalább 1 System, ezt az 1..*-al jelöltük.
+A hasPrograms-nak a JavaScriptAddonban lesz jelentősége, amit \aref{chap:javaScriptAddon_bevezetes} alfejezetben taglalok bővebben.
+A ProgramSourceType is a DataStructures package-ben lett definiálva. A ProgramSourceType értéke lehet source, vagy module.
+A Base package eltér a TypeScript-eslint$^{~\cite{typescript-eslint}}$ projektben lévő Base package-től.
+Régebbi sémának a Base package-ét használjuk, BaseNode és BaseToken osztályok kibővítésével.
+
+\noindent
+
+Mivel a Base package egyedi a mi esetünkben, ezért kitérnék a Declaration package-re is.
+A Declaration package-n belül az ExportAllDeclaration osztályt mutatom be.
+
+\begin{lstlisting}[caption={ExportAllDeclaration TypeScript megvalósítása},label={lst:ExportAllDeclaration}, language={JavaScript}]
+export interface ExportAllDeclaration extends BaseNode {
+      type: AST_NODE_TYPES.ExportAllDeclaration;
+      assertions: ImportAttribute[];
+      exported: Identifier | null;
+      exportKind: ExportKind;
+      source: StringLiteral;
+}
+\end{lstlisting}
+
+\Aref{lst:ExportAllDeclaration} kódrészlet megvalósítása a sémában:
+
+\begin{figure}[!htbp]
+      \caption{A Declaration package felépítése}\label{fig:declaration_vpp}
+      \centering
+      \includegraphics[width=1\textwidth]{declaration.png}
+\end{figure}
+
+Az ExportAllDeclaration osztály öröklődik a DeclarationStatement osztályból, ami öröklődik a BaseNode osztályból.
+Ezért az ExportAllDeclaration egyaránt öröklődik a BaseNode osztályból.
+\Aref{lst:ExportAllDeclaration} kódrészletben ez az extends BaseNode-al van jelezve.
+A főbb osztályok a BaseNode alatt találhatóak az ábrán.
+Az ábra jobb oldalán lévő osztályok, amik sötét- és világosszürkével vannak jelölve, az attribútumok.
+Az ExportAllDeclaration osztály öröklődik a Statement, DeclarationStatement, Node és a ProgramStatement osztályokból.
+Az összes öröklődés a TypeScript-eslint$^{~\cite{typescript-eslint}}$ projekt unions mappájában találhatóak meg.
+Az ExportAllDeclaration osztály rendelkezik pozíció, Comment, type és NodeId attribútummal, mivel öröklődik a BaseNode osztályból.
+Emellett még rendelkezik Assertions, Source és Exported attribútummal is.
+Az Assertions attribútum típusa ImportAttribute, amihez legalább egy ImportAttribute tartozik.
+Az Exported attribútumnál típusa lehet vagy Identifier vagy LiteralExpression.
+A vagyolást egy OR-ral jeleztük a sémában.
+Az Exported attribútum opcionális, ezért az értéke lehet null is. Ezt a sémában a 0..1-el jelöltük.
+A Source attribútum is opcionális, típusa StringLiteral.
+Végül, ExportKind attribútummal is rendelkezik, típusa ExportAndImportKind.
+Az ExportAndImportKind az a DataStructures package-ben lett definiálva.
+Így lett minden package és osztály felépítve.
+A DeclarationStatement, Statement, ProgramStatement és több osztály, ami a unions mappában található, gyűjtő osztály, aminek a jelentősége a javaScriptAddonnál fog mutatkozni.
+
+\noindent
+
+A DataStructures package többször volt említve, hadd mutassam be a következő ábrán a felépítésést:
+
+\begin{figure}[!htbp]
+      \caption{A DataStructures package felépítése}\label{fig:data_structures_kinds}
+      \centering
+      \includegraphics[width=0.8\textwidth]{data_structures.png}
+\end{figure}
+
+A DataStructures package-ben található 2 package, Kinds és Typedefs. \Aref{fig:JavaScriptSchema_struktura} ábrán látható. Ebből a Kinds package-et mutatom be.
+\Aref{fig:data_structures_kinds} ábrán a Kinds package-nek egy kisebb része látható.
+Enumok vannak deklarálva ebben a package-ben.
+Az enumokban konstansok találhatóak. Minden konstans előtt található 3 karakter, ezek a karakterek ASG konvertáláskor el fognak tűnni.
+Ha ExportAndImportKind-ot adunk meg egy attribútum típusának, akkor az attribútum típusa lehet Type vagy Value.
+
+\noindent
+
+Ahhoz, hogy tudjuk használni a sémát, először ki kell exportálni. Ezt a vpp segítségével tehetjük meg, egy xml formátumú fájlba exportáljuk az egész projektet.
+Ezután ezt a fájlt átkonvertáljuk egy asg kiterjesztésű fájlra.
+A SourceMeter alprojektei közé tartozik egy úgynevezett UmlToAsg.
+Ez a projekt egy xml fájlból egy asg fájlt generál.
+Az UmlToAsg projektet a SchemaGenerator segítségével tudjuk legenerálni.
+A SchemaGenerator C++ nyelven megírt eszköz.
+Több mindent is generál C, C++, vagy Java nyelven.
+A SchemaGenerator is a SourceMeter alprojektei közé tartozik.
+A legenerált asg fájl elején a következő sorok láthatóak:
+
+\begin{lstlisting}[caption={Asg fájl első sorai},label={lst:asg_file_eleje}, language={JavaScript}]
+NAME = javascript;
+APIVERSION = 0.3.1;
+BINARYVERSION = 0.3.1;
+CSIHEADERTEXT = JavaScriptLanguage;
+\end{lstlisting}
+
+A verziókat kézzel tudjuk átírni abban a fáljban ami generálja ezt, ez egy C++ fájl, a SchemaGeneratorban található meg.
+Ezután a Kinds package tartalmát írja bele a következőképpen:
+
+\begin{lstlisting}[caption={Asg fájl kind},label={lst:asg_file_kinds}, language={JavaScript}]
+KIND ASTNodeTypes (ant) {
+      FunctionDeclaration;
+      BlockStatement;
+      ClassDeclaration;}
+\end{lstlisting}
+
+A 3 karaktert, amit minden konstans elé írtunk, kikerült paraméterbe és csak az utáni stringet írta át.
+Ugyanígy jár el a többi enumnál is.
+Ha az összes enumot beleírta, akkor a többi package-et kezdi el bele írni a fájlba. \Aref{fig:JavaScriptSchema_struktura} alapján megy sorba.
+Példának a Declaration package-et mutatom be, azon belül is az ExportAllDeclaration osztályt.
+
+\begin{lstlisting}[caption={Asg fájl ExportAllDeclaration},label={lst:asg_file_export_all_declaration}, language={JavaScript}]
+SCOPE declaration {
+      NODE DeclarationStatement : virtual base::BaseNode [ABSTRACT] {
+      }
+      NODE ExportAllDeclaration : DeclarationStatement, statement::Statement, virtual statement::ProgramStatement, special::Node {
+            ATTR ExportAndImportKind exportKind;
+            EDGE TREE 1 hasExported (expression::Identifier | expression::LiteralExpression);
+            EDGE TREE 1 hasSource (structure::StringLiteral);
+            EDGE TREE * hasAssertions (special::ImportAttribute);
+      }
+}
+\end{lstlisting}
+
+Az UmlToAsg minden egyes package-et Scope-nak értelmez.
+A Scope-on belül az osztályokat node-nak értelmezi.
+A node-nak kettő különféle attribútuma lehet, ATTR és EDGE TREE.
+Akkor konvertálja ATTR-ra az attribútumot, ha az a DataStructures package-ben deklarálva lett. Egyéb esetben EDGE TREE-vé konvertál.
+Az EDGE TREE után álló szám vagy csillag, az adott attribútum multiplicitását jelenti.
+A vagyolást egy | jellel jelzi.
+Az öröklődést kettősponttal jelzi.
+Felsorolásszerűen írta át, ha valami másból származik, akkor packageNev::osztalyNev szerint.
+\Aref{fig:declaration_vpp}as ábrán látható, hogy mit hogyan írt át.
+
 % Sajnos dokumentáció nem készült az előző filehoz, ezért nekünk kellett kitalálni, hogy mi mit csinált, hiszen akik ezt írták, ők már nem foglalkoztak ezzel és elérhetetlenek voltak.
 % A szerkesztéshez szükséges volt a Visual Paradigm alkalmazást használni.
 % Ezzel egyikőnk sem találkozott még, szóval először ezt kellett tanulmányozni, megérteni.
@@ -56,9 +216,154 @@ A SourceMeter for JavaScript projekt több alprojektet is magába foglal, amelye
 % Végül az újraírás mellett döntöttünk, hiszen ezt láttuk gyorsabb és könnyebb megoldásnak. Egy könnyen bővíthető, dokumentál schema volt az elképzelés.
 % Ketten fejlesztettük le végül ezt a schemát.
 
-\subsection{JavaScriptAddon bevezetés}
+\subsection{JavaScriptAddon bevezetés}\label{chap:javaScriptAddon_bevezetes}
+\todoi{nodeWrapperHeader és Wrapper fájl magyarázása}
 
-\subsection{JSAN bevezetés}
+\noindent
+
+A JavaScriptAddon az egy node kiterjesztésű fájl, amit a SchemaGenerator generál. Minden egyes node-nak külön generál nodeWrapperheader és egy nodeWrapperCC fájlt.
+A SchemaGenerator által generált Factory.cc, Factory.h, az összes nodeWrapper.cc és a hozzátartozó nodeWrapper.h fájlok összeolvasztása eredményezi a javascriptAddon.node fájlt.
+A SchemaGeneratornak több generálása is definiálva van, hiszen több funkciója is van.
+A JavaScriptAddon generálást a NodeAddonGenerator fájlban hajtjuk végre.
+A main.c fájlba importáljuk a NodeAddonGenerator metódusait, és ezeket használva legeneráljuk a JavaScriptAddon fájlt.
+A következő oldalakon bemutatom, hogy a generálás hogyan zajlik.
+A SchemaGeneratornak több kapcsolója is van, köztük a genNodeAddon.
+Ha a genNodeAddon kapcsoló meg van adva, akkor legenerálja a JavaScriptAddon fájlt.
+Minden kapcsolóra vizsgál a SchemaGenerator.
+
+\begin{lstlisting}[caption={SchemaGenerator kapcsoló vizsgálás},label={lst:schemagenerator_argv_genNodeAddon}, language={CStyle}]
+if(!strcmp(argv[i], "-genNodeAddon")){
+      options.generateNodeAddon = true;
+}
+\end{lstlisting}
+
+Ha az argumentumban megtalálható a genNodeAddon, akkor az options.generateNodeAddon-t igazra állítja.
+Az alapértelmezett értéke az options.generateNodeAddon-nak hamis.
+Több fájl generálás után, ami kell több program működéséhez, megvizsgálja az options.generateNodeAddon-t.
+Ha az options.generateNodeAddon hamis, akkor nem történik semmi, tovább megy.
+
+\begin{lstlisting}[caption={SchemaGenerator JavaScriptAddon generálás},label={lst:schemagenerator_genNodeAddon_check}, language={CStyle}]
+if (createAndEnterDirectory(SOURCE_NODE_ADDON_DIR_NAME)) {
+      generatePackageJson();
+      generateBindingGyp();
+      generateAddonCC();
+      generateFactoryWrapper();
+      if (createAndEnterDirectory("inc")) {
+            generateWrapperHeaders();
+            leaveDirectory();}
+      if(createAndEnterDirectory("src")){
+            generateWrapperSources();
+            leaveDirectory();}
+leaveDirectory();}
+\end{lstlisting}
+
+A createAndEnterDirectory metódus létrehoz addon nevű mappát és chdir parancsot használva belelép.
+Ha az addon mappa már létezik, akkor a létrehozást kihagyja és a chdir paranccsal belelép.
+Létrehozás és chdir parancs használat után az addon mappában generál egy a package.json fájlt.
+Ebben a fájljban beállítja a projekt nevét, verziószámát, függőségeket, szkripteket és a gypfájl kapcsolónak igaz értéket beállítja.
+
+\begin{lstlisting}[caption={NodeAddonGenerator package.json szkriptek}, label={lst:nodeAddonGenerator_package_json}, language={CStyle}]
+fprintf(f, "    \"rebuild\": \"node-gyp configure && node-gyp rebuild -j 8\",\n");
+fprintf(f, "    \"install\": \"node-gyp configure && node-gyp build -j 8\"\n");
+\end{lstlisting}
+
+\Aref{lst:nodeAddonGenerator_package_json} kódrészleten látható, hogy a gyp segítségével fog történni a generálás.
+
+\noindent
+
+Ezután legenerálja a binding.gyp fájlt.
+\todoi{Wrapper és headerek lefordítása}
+A binding.gyp fájl fog felelni azért, hogy a JavascriptAddonhoz sikeresen generálódjanak le a wrapperek és azok headerjei.
+Ezután fogja legenerálni az addonCC-t.
+Az addon.cc fájlba importálja a Factory.h fájlt, amiben több metódus is megtalálható.
+
+\begin{lstlisting}[caption={Addon.cc Wrapperek importolása}, label={lst:addoncc_wrapper_include}, language{CStyle}]
+if (!traversalDescendantBFT(rootNode, generateWrapIncludes, false)) {
+      debugMessage(0, " failed\n");
+      fclose(f);
+      return false;
+}
+\end{lstlisting}
+
+\Aref{lst:addoncc_wrapper_include} kódrészletben a traversalDescendantBFT metódust egy másik projektből importáltuk.
+Ez egy bejárás, ami az összes node-ra lefut, és az összes node-ra meghív egy metódust, jelen esetben a generateWrapIncludes metódust.
+Ez a generateWrapIncludes a nodeAddonGenerator.c fájlban van leimplementálva a következőképp:
+
+\begin{lstlisting}[caption={generateWrapIncludes leimplementálása}, label={lst:addoncc_wrapper_includes_implementation}, language{CStyle}]
+if(node->type.abstract){
+      return true;
+}
+fprintf(f, "#include \"");
+fprintf(f, "inc/%sWrapper.h\"\n", node->name );
+return true;
+\end{lstlisting}
+
+Először megvizsgálja, hogy az adott node absztrakt-e, ha nem akkor tovább megy, és az addon.cc-be importálja az adott nodeWrappernek a headerjét.
+A node.name több értéket is vehet fel, például FunctionDeclaration, ClassDeclaration, amik megtalálhatóak az asg fájlban.
+Ezután ezt a bejárást mégegyszer végrehajtja, de most a wrapperIniteket generálja az addon.cc fájlba.
+Annyi változtatással, hogy picit mást ír az addon.cc fájlba.
+\begin{lstlisting}[caption={generateWrapInit leimplementálása}, label={lst:addoncc_wrapper_inits_implementation}, language={CStyle}]
+fprintf(f, "  columbus::%s::asg::addon::%sWrapper::Init(env, exports);\n", schemaName, node->name);
+\end{lstlisting}
+
+Ezek után az addon.cc fájlt sikeresen legeneráltuk.
+Benne találhatóak a wrapperek headerjének importolása és a wrapperek Initjei.
+
+\noindent
+
+Ezután következik egy generateFactoryWrapper függvényhívás.
+A generateFactoryWrapperben 2 metódus függvényhívás található, a generateFactoryWrapperHeader és generateFactoryWrapperSource.
+
+\noindent
+
+A generateFactoryWrapperHeader a Factory.h fájlt generálja le a következőképp:
+Először importálja az összes nodeWrappernek a headerjét, és utána létrehoz egy Factory osztályt, a publikus metódusait, ami az Init és Destructor, illetve a private metódusait,
+ami a destructor, New, SaveAST, LoadAST, Clear, getRoot és az összes nodeWrapper create metódusait.
+Erre azért van szükség, mivel majd a JSAN-ban ezeket a wrappereket fogjuk létrehozni és szerkeszteni.
+
+\noindent
+
+A generateFactoryWrapperSource pedig a Factory.cc fájlt generálja le.
+Ebben a fájlban megvan az összes metódus valósítva, ami a headerjében található.
+A Factory Initjének a props változója a következőképpen néz ki:
+
+\begin{lstlisting}[caption={Factory.cc fájl}, label={factory_cc}, language={CStyle}]
+napi_property_descriptor props [] = {
+      DECLARE_NAPI_METHOD("getRoot", getRoot),
+      DECLARE_NAPI_METHOD("createCommentWrapper", createCommentWrapper)
+      ...}
+\end{lstlisting}
+
+DeclareNapiMethodokat hoz létre, az összes nodeWrappernek, ezeket majd a JSAN-ban fogjuk használni.
+
+\noindent
+
+Utolsó lépésként, az inc mappát majd az src mappát generálja le a SchemaGenerator.
+Az inc mappában találhatóak a header fájlok egyes wrappereknek, az src mappában maguk a wrapperek vannak megvalósítva.
+Minden node-nak hoz létre wrapper fájlt, és ezekben valósít meg több metódust.
+Létrehoz egy ExportAllDeclarationWrapper.h és egy ExportAllDeclaration.cc fájlt.
+A header fájlban létrehoz egy ExportAllDeclarationWrapper osztályt, ami öröklődik a BaseWrapperből. A BaseWrapper alap Wrapper osztály, amit bővíteni fogunk.
+Három publikos metódust generál, Init, Destructor és a NewInstancet.
+Ezen felül több private metódust is.
+
+\begin{lstlisting}[caption={ExportAllDeclaration.h fájl}, label={lst:ExportAllDeclaration_header}, language={CStyle}]
+napi_property_descriptor props [] = {
+      static napi_value setPosition(...);
+      static napi_value addAssertions(...);
+      static napi_value setType(...);
+...}
+\end{lstlisting}
+
+Látható \aref{lst:ExportAllDeclaration_header} kódrészleten, hogy létrehozott az ExportAllDeclarationWrappernek egy setPosition, addAssertions, setType és még több metódust.
+Ezek az ExportAllDeclaration attribútumai, amit a sémában beállítottunk.
+\Aref{fig:declaration_vpp} ábrán látható, hogy az ExportAllDeclaration hasAssertions attribútumának a multiplicitása 1..*, ezt átkonvertálta addAssertionsre.
+Ahol 0..* a multiplicitás, azt átkonvertálta setAttribute-ra, pl setSource vagy setExportedre.
+Minden nodeWrappernek van olyan metódusa, hogy setPath, setPosition, setType, addComments.
+
+\noindent
+
+Az ExportAllDeclaration.cc fájlban ugyanaz történik, mint ami volt a Factory.cc fájlban. DECLARE\_NAPI\_METHOD-okat generál, a setExported, setSource, setType és a többi metódushoz.
+Ezután az összes metódust megvalósítja.
 
 \subsection{JSAN2Lim bevezetés}
 
