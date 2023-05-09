@@ -41,26 +41,28 @@ A bővítések, hogy mikkel bővítettem a JSAN2Lim-et:
 
 \section{Ast binder optimalizálás}
 
-Az AST binder referenciákat bindol. Ezek a referenciák a JSAN2Lim programhoz kellenek.
-Binder néven van definiálva az astTransformer.js fileban.
+\noindent
+
+Az AST binder referencia kötésekre (továbbiakban: bindolásra) alkalmas. Ezek a referenciák a JSAN2Lim programhoz szükségesek.
+Binder néven van definiálva a metódus a JSAN-ban.
 Kétszer van használva, ezért is kulcsfontosságú, hogy gyors legyen.
 Egyszer VariableUsages referenciákat bindol és egyszer ACG referenciákat bindol.
 
 \noindent
 
 A binder 4 argumentumot vár:
-
+\todoi{ACG megnézése, hogy mit rövidít}
 \begin{itemize}
-      \item Egy stringet, ami lehet vagy VU (ami VariableUsages-t rövidíti) vagy ACG (egy javascript callgraph).
-      \item Egy Abstract Syntax Tree-t (AST), ami egyedien van felépítve.
+      \item Egy stringet, ami lehet vagy VariableUsages (továbbiakban: VU) vagy ACG (egy javascript callgraph).
+      \item Abstract Syntax Tree-t (továbbiakban: AST), ami egyedien van felépítve.
       \item Egy tömböt, amiben JSON objektumok találhatóak, amik a linkeket tartalmazzák.
-      \item Végül még egy stringet, ami lehet addCalls, vagy setRefersTo. Az AddCalls és a SetRefersTo a javascriptAddonban található meg és onnan hívódik meg.
-      Akkor addCalls ha ACG referenciákat bindolunk és akkor setRefersTo ha VU referenciákat.
+      \item Végül még egy stringet, ami lehet addCalls, vagy setRefersTo. Az AddCalls és a SetRefersTo a JavaScriptAddon-ban található meg és onnan hívódik meg.
+      Abban az esetben kap addCalls értéket, ha ACG referenciákat bindol a binder, és akkor setRefersTo, ha VU referenciákat.
 \end{itemize}
 
-A linkeket tartalmó tömb egyik JSON objektuma a következőképp néz ki:
+A linkeket tartalmó tömb egy JSON objektuma a következőképpen néz ki:
 
-\begin{lstlisting}[caption={Binder JSON argumentuma}, label={lst:binder_json_arg}, language={JavaScript}]
+\begin{lstlisting}[caption={Binder JSON objektuma}, label={lst:binder_json_arg}, language={JavaScript}]
 source: {
       label: IdentifierNeve,
       file: AbsPath,
@@ -72,24 +74,28 @@ source: {
 target: {...}
 \end{lstlisting}
 
-\Aref{lst:binder_json_arg} kódrészletben egy JSON elemét láthatjuk a tömbnek. Ilyen JSON elemekből épül fel a tömb.
-A source és a target felépítése ugyanaz, csupán másak az értékek bennük.
-A kódrészletben csak a sourcet fejtettem ki kicsit bővebben. A label az egy Identifier vagy PrivateIdentifier nevét fogja jelölni.
-A file egy abszolút útvonalat, ami az Identifiert tartalmazó filet jelöli.
-A start az egy object, amiben külön van sor és oszlop meghatározva. Ez az Identifier első karakter pozíciójának a sor és oszlop értékei.
-Az end ugyanaz, mint a start, csak itt az utolsó karakter pozíciójának a sor és oszlop értékei.
-A range is egy object, a start ennél a kezdő karakter hanyadik karakter volt a kódban, és az end pedig az identifier utolsó karakterének a karakterszáma.
-A node is egy object ami maga az Identifier vagy PrivateIdentifier.
+Ilyen JSON elemekből épül fel a tömb.
+A source és a target objektum felépítése ugyanaz, csak másak az értékek.
+A kódrészletben a source van kifejtve bővebben.
+A \texttt{label} az egy Identifier vagy PrivateIdentifier node nevét fogja jelölni.
+A \texttt{file} egy abszolút útvonalat kap, ami az Identifiert tartalmazó fájlt jelöli.
+A \texttt{start} az egy objektum, amiben külön van sor és oszlop meghatározva. Ez az Identifier első karakter pozíciójának a sor és oszlop értékei.
+Az \texttt{end} ugyanaz, mint a \texttt{start}, csak itt az utolsó karakter pozíciójának a sor és oszlop értékei.
+A \texttt{range} is egy objektum, a start ennél a kezdő karakter hanyadik karakter volt a kódban, és az end pedig az Identifier utolsó karakterének a karakterszáma.
+A \texttt{node} is egy objektum ami maga az Identifier vagy PrivateIdentifier.
 
 \subsection{Lassúság okai}
 
-A binder nagyobb projektekre lassan fut le. Ennek több oka is van:
+Binder-nek a futási ideje lényegesen megnő, ha nagyonn projektekre futtatjuk le.
+Ennek több oka is van:
 
 \begin{itemize}
-      \item Minden hívásnál meghívja a javascriptAddon.nodeot, ami már magában nagy file. TypeScript támogatás után kétszeres lett a mérete, ezáltal sokkal lassabb lett.
-      \item Mivel nagyobb a projekt, ezért sokkal több a függvényhívás is az elemzett kódban, emellett sok a változószám is.
-      \item Az AST nagyon nagy, és ezt bejárjuk többször is bindolás alatt. Emiatt nagyon lassú a program nagy projektek esetén.
-      \item A JSONokat tartalmazó tömb is nagyon nagy lesz, de annyira ez nem lassítja le a programot.
+      \item Minden node hívásnál meghívja a JavaScriptAddon-ból egy metódust.
+      A JavaScriptAddon már magában nagy terjedelmű fájl. TypeScript támogatás után kétszeresére nőtt a mérete, mint ezelőtt, emiatt lassult is.
+      \item Nagyobb projektekben több függvényhívás és változószám található az elemzett kódban.
+      \item Az AST nagyobb projekteknél nagyon nagy is lehet.
+      Ezt az AST-t bejárjuk többször is bindolás alatt. Emiatt lesz nagyon lassú a binder.
+      \item A JSON objektumokat tartalmazó tömb is nagy méretű lesz, de ez kevésbé lassítja a bindert, mint az AST-s bejárás.
 \end{itemize}
 
 \subsection{Optimalizálás}
