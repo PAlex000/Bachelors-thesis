@@ -171,3 +171,22 @@ Ha target node-ot, akkor visszaadjuk a \texttt{getWrapperOfNode(indexedAST[Fájl
 Ha source node-ot keresünk, akkor a walk függvény segítségével bejárjuk a beindexelt tömböt.
 Ez lényegesen gyorsabb, mint a resolveNode-os megoldás, mert ott minden egyes esetben az egész AST-t bejártuk a walk függvény segítségével, jelen esetben csak a beindexelt tömb elemét járjuk be.
 Ha megkaptuk a source node-ot akkor visszaadjuk azt a \texttt{getWrapperOfNode(result)} hívással.
+
+\subsection{Eredmények}
+
+\todoi{Kisebb és nagyobb projekt összehasonlítása}
+
+\begin{lstlisting}[caption={JSAN lefutási idő előtte és utána}, label={lst:jsan_before_after_comparison}]
+Optimalizalt_verzio:
+Binding VU: 71599/71599
+VU binding: 1:39.140 (m:ss.mmm)
+
+Optimalizalatlan_verzio:
+Binding VU: 71599/71599
+VU binding: 42:31.211 (m:ss.mmm)
+\end{lstlisting}
+
+Ugyanazt az outputot adja mind a kettő program, szóval csak gyorsaságban és memóriahasználatban változott sokat.
+
+Emellett a JavaScriptSchema újraírása is sikeres volt, emiatt a JSAN tud typescriptes kódokat elemezni.
+JSAN2Limet sikeresen módosítottam, hogy a JSAN által kiadott outputot sikeresen limmé alakítsa.
