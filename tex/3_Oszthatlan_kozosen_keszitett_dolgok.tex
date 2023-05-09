@@ -2,21 +2,34 @@
 
 \section{A nyelvi séma átírása}
 
+% Sajnos dokumentáció nem készült az előző filehoz, ezért nekünk kellett kitalálni, hogy mi mit csinált, hiszen akik ezt írták, ők már nem foglalkoztak ezzel és elérhetetlenek voltak.
+% A szerkesztéshez szükséges volt a Visual Paradigm alkalmazást használni.
+% Ezzel egyikőnk sem találkozott még, szóval először ezt kellett tanulmányozni, megérteni.
+% Ezután értelmezni kellett a meglévő schemát, hiszen eddig az jól működött, csak nem lehetett könnyen bővíteni.
+% Mérlegeltük a két opciót, ahol vagy megpróbáljuk bővíteni a jelenlegi schémát, vagy nulláról elkezdjük újraírni.
+% Végül az újraírás mellett döntöttünk, hiszen ezt láttuk gyorsabb és könnyebb megoldásnak. Egy könnyen bővíthető, dokumentál schema volt az elképzelés.
+% Ketten fejlesztettük le végül ezt a schemát.
 \noindent
 
-A JSAN a JavaScriptSchemára épül. Ha valamit meg akarunk változtatni gyökerestül a JSANba, akkor a schémát is változtatni kell.
-Azt elérni, hogy javascript mellett még typescriptes kódokat is elemezzen a JSAN, ahhoz gyökerestül meg kellett változtatni a JavaScript Analyzert.
-Az előző JavaScriptSchema (ami csak javascriptet elemzett) az a javascript hivatalos oldala alapján készült. Ami ábrák fentebb megtalálhatóak, azok már az átírt schémából vannak.
-Több opció is volt, hogy most vagy legyen átírva a schéma, vagy legyen egy külön typescriptre is írva.
-Végül rájöttünk, hogy ha van egy typescriptes schémánk, az képes javascriptet ugyanúgy elemezni ha megfelelően van lefejlesztve.
-Így egy schémát fejlesztettünk le. Az előző schéma átláthatatlan volt, ezért úgy döntöttünk, hogy majdnem a nulláról újraírjuk.
-Egyedül a base packaget emeltük át a régiből, BaseNode-al és BaseTokennel kibővítve (\Aref{fig:base_vpp} ábrán látható).
-Emellett el kellett dönteni, hogy milyen struktúrát kövessünk, ami jól átlatható és később könnyebben bővíthető.
-Végül a typescript-eslint official github alapján haladtunk. Annyi változtatással, hogy ami nekik a base mappában volt, mi arra létrehoztunk egy külön structure packaget.
-Mindenhez készítettünk dokumentációt, jól érthetően leírtuk, hogy mit miért kellett csinálni.
-Mivel minden is egymásra épül a typescriptes schémában, ezért nem tudtuk tesztelni minden egyes package után, hogy működik-e vagy sem.
-Mint például, látható \aref{lst:asg_file_export_all_declaration} kódrészleten, hogy az ExportAllDeclaration mennyi mindenből származik le vagy mennyire sok attribútuma van.
-Az ExportAllDeclaration egyik attribútuma, az assertions típusa az ImportAttribute. Ahhoz, hogy jól észrevegye az ExportAllDeclarationt az Analyzer, ahhoz jól le kellett fejleszteni az ImportAttributet.
+Az eddigi JavaScript nyelvi séma (továbbiakban: séma), ami csak javascript nyelvű projekteket és fájlokat elemzett, a javascript hivatalos oldala$^{~\cite{javascript}}$ alapján készült.
+\Aref{chap:nyelvi_sema} fejezetben ami ábrák láthatóak, azok már az átírt sémából lettek kifotózva.
+
+\noindent
+
+A séma átírásánál arra a döntésre jutottunk, hogy elölről kezdjük az egészet.
+Átláthatatlan volt az előző séma, és nem volt hozzá megfelelő dokumentáció, ezért a bővítés nehezebbnek bizonyult, mint az újraírás a kezdetekről.
+Továbbá, egy séma ami képes TypeScript fájlokat és projekteket elemezni, az képes JavaScript fájlokat és projekteket is.
+A Base package-et emeltük át az előző sémából, BaseNode-al és BaseToken-el kibővítve. Ez látható \aref{fig:base_vpp} ábrán is.
+A TypeScript-eslint github$^{~\cite{typescript-eslint}}$ alapján hoztuk létre a struktúrális felépítést,
+annyi változtatással, hogy mi hoztunk létre még egy structure nevű package-et, amiben azok az osztályok találhatóak meg, amelyek a TypeScript-eslint github base mappájában voltak.
+Fejlesztés során dokumentáltuk a lépések nagy részét.
+
+\noindent
+
+Minden egymásra épül a sémában, emiatt a műkődést nem tudtuk az elején letesztelni, csak miután több package is készen lett.
+Megfigyelhető \aref{lst:asg_file_export_all_declaration} kódrészleten, hogy az ExportAllDeclaration több mindenből öröklődik és sok attribútuma van.
+Az ExportAllDeclaration egyik attribútumának a típusa az ImportAttribute.
+Ehhez az ImportAttribute osztályt is le kellett fejleszteni a sémában.
 
 \begin{lstlisting}[caption={ImportAttribute},label={lst:asg_file_import_attribute}, language={JavaScript}]
 export interface ImportAttribute extends BaseNode {
@@ -25,52 +38,29 @@ export interface ImportAttribute extends BaseNode {
       value: Literal;
 }
 \end{lstlisting}
-Ahhoz, hogy az ImportAttributet letudjuk fejleszteni a schémában, ahhoz le kell fejleszteni az Identifiert, és a Literalt.
-Kicsit összetett, hogy mi minden épül egymásra. Ebből adódik a következő alfejezet mondandója is.
+
+Az ImportAttributet lefejlesztéséhez le kell fejleszteni az Identifiert, és a Literalt is.
+Ezek lefejlesztéséhez is kellett más-más osztályokat lefejleszteni.
+
+\noindent
 
 \section{Nehézségek, problémák}
 
 \noindent
 
-A schéma átírása során több nehézségbe is ütköztünk.
-A legelső nehézség az a Visual Paradigm program korrekt használata volt.
-Egy kisebb időbe tellett rájönni arra, hogy egy adott classnak hogyan kell megváltoztatni a háttérszínét, packagek közötti mozgást, hogyan kell egy adott classra hivatkozni ami másik packageben volt.
-Ezután ami szerintem a legnagyobb nehézség volt, az az, hogy nem volt dokumentáció az előző schémához.
-Mindent nekünk kellett kitalálni, hogy mit miért csináltak az előző fejlesztők. Akik ezt a schémát fejlesztették le, ők már nem foglalkoztak ezzel, és más nem nagyon mélyedt bele ebbe az egészbe azóta.
-A következő nagyobb nehézség, az az volt, hogy összehozzunk egy olyan schémát ami működőképes, és az analyzer ezt tudja is használni.
-Előző alfejezetben említettem, hogy egy adott classt (mint például ExportAllDeclaration) lefejlesszünk, ahhoz sok minden mást is le kell fejleszteni, amihez meg még több minden kellett.
-Ebből adódóan tesztelni nagyon nem tudtunk, mivel az egésznek működnie kellett ahhoz, hogy az analyzer egyáltalán lefusson.
-Mivel mi majdnem nulláról írtuk újra, ez volt a hátrány.
-Amikor elérkeztünk ahhoz az állapothoz, hogy mindenre rámondjuk azt, hogy működik, akkor jött egy nagyobb probléma.
-Valahol Segmentation Fault-ot kapott a program, és nem nagyon tudtuk ezt debugolni.
-Több sejtésünk is volt, hogy mi lehet a baj. Emiatt az egész schémát át kellett nézni alaposan, hogy hol vétettünk hibákat.
-Sok helyen voltak pontatlanságok, rossz osztályból származtattunk le, rossz típus volt megadva attribútumnak. Ezeket mind kijavítottuk, de most már más hibát kaptunk.
-A JavaScript Analyzerben kiderítettük, hogy pontosan hol szállt el a program.
-A Literal volt a hiba, mivel ezt nem a github alapján írtuk meg, hanem egyedi ötlettel. Előző schémában is máshogy volt megoldva.
-\begin{figure}[!htbp]
-      \caption{A DataStructures packageben a Kind package felépítése}\label{fig:literal}
-      \centering
-      \includegraphics[width=0.8\textwidth]{literal.png}
-\end{figure}
-
-\Aref{fig:literal} ábrán látható, hogy a LiteralExpressionből (Ami a Literal) több literal is öröklődik.
-\begin{lstlisting}[caption={Literal},label={lst:asg_file_literal}, language={JavaScript}]
-export interface LiteralBase extends BaseNode {
-  type: AST_NODE_TYPES.Literal;
-  raw: string;
-  value: RegExp | bigint | boolean | number | string | null;
-}
-\end{lstlisting}
-Próbáltuk úgy megoldani, hogy 4 vagyolással 4 különböző literál tartalmazza, de az analyzerben máshogy kezeltük le a literalt, mint nodeot.
-Ezért a tartalmazás helyett inkább örököltettünk a literalból, így megoldva ezt a problémát.
-Még az is probléma volt, hogy volt egy LiteralBaseünk, amiből származott ez az 5 literal. A LiteralBase származott a LiteralExpressionből, de valamiért Segmentation fault lett a vége ha így próbáltuk megoldani.
-Ezért a LiteralBase-t kivettük, és LiteralExpressionből származik minden literal.
-Végül még az volt a nehézség, hogy kódrészletet keressünk az analyzernek, amin le tudjuk tesztelni, hogy az analyzer jó outputot ad-e.
+A séma újból írása során több nehézségbe ütköztünk.
+Dokumentáció hiánya miatt nem tudtuk az előző sémának minden részét jól értelmezni, néhány félreértés volt fejlesztés közben.
+Fejlesztés végén, miután az összes package és osztály le volt fejlesztve, próbáltuk tesztelni.
+Tesztelés során Segmentation Fault hibát kapott a program, és nem tudtunk rájönni, hogy miért történik ez.
+Emiatt az egész sémát átnéztük, biztosra mentünk, hogy az osztályok öröklődési jól voltak a sémában lefejlesztve, illetve az összes attribútumot is ellenőriztük.
+Több kisebb figyelmetlenséget is észrevettünk, és javítottuk.
+Több javítás után, újra próbáltunk tesztelni. Ebben az esetben egy másik, jobban beazonosítható hibát kaptunk futtatás során.
+Már nem kaptunk Segmentation Fault hibát, hanem futás közben egy node-nál minden hibaüzenet nélkül leállt a program.
+Kiderítettük, hogy melyik node-nál áll le a program mindig, ez volt maga a Literal node.
+Ismét átnéztük a LiteralExpression osztályt, mivel ez maga a Literal, és egy rossz osztályból öröklődött le, ez okozta a program leállását.
+Javítottuk a problémát, és ezek után hibamentesen és jól letudtuk futtatni.
 
 \noindent
 
-Mivel nem nagyon volt typescriptes háttértudásunk, először a typescriptet kellett átnézni, hogy mit hogyan tudunk megvalósítani.
-Emellett még a javascriptes outputokat is át kellett nézni, mivel a mi célunk a fejlesztés volt. A jelenlegi javascriptes projektekre ugyanolyan eredményt adott, sőt néhány helyen jobbat is, mert az előző schémában is voltak pontatlanságok.
-A typescriptes projektek nagy részét tudja elemezni az analyzer, de közel sem tökéletes, mivel egyfolytában kellene fejleszteni a schémát, mivel a typescript nem annyira régi.
-
-
+Továbbá sok nyelvi elemet a TypeScriptben nem ismertünk.
+Tanulmányozni kellett jobban a TypeScript programozási nyelvet, hogy tesztek átnézése során tudjuk mit elemzett le jól és mit nem.
