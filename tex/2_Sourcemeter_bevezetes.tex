@@ -422,3 +422,57 @@ Utána a classStack-hez hozzáadódik az adott osztály tulajdonságai, beállí
 Minden egyes node-nál ez az eljárás fut le.
 
 \subsection{Regressziós tesztelés bevezetés}
+
+\noindent
+
+
+A regressziós tesztelés általában egy olyan szoftvertesztelési típus, amely akkor használatos, amikor megerősítjük, hogy a legfrissebb program- vagy kódmódosítások nem érintették negatív módon a meglévő funkciókat.
+A regressziós tesztelés során megállapítják, hogy a szoftver vagy alkalmazás megfelelően működik-e az új változások és hibajavítások tekintetében.
+A regressziós tesztelés főként arról szól, hogy az már végrehajtott teszteseteket újra lefuttatjuk annak érdekében, hogy megerősítsük, az alkalmazás megfelelően működik-e.
+
+A regressziós tesztelésnek 7 különböző típusa van:
+
+\noindent
+
+Re-test All (Mindent újratesztelni): Egy módja a regressziós tesztelésnek az, hogy az összes tesztesetet újra futtatjuk.
+Ez valójában egy költséges folyamat, mivel több időt, erőforrást és erőfeszítést igényel az egész teszteset újbóli végrehajtása.
+Az ebben a folyamatban észlelt hibákat előre jelentik a javítás érdekében.
+
+\noindent
+
+Corrective Regression Testing (Javító regressziós tesztelés):
+A javító regressziós tesztelés a regressziós tesztelés egyszerűbb formái közé tartozik, minimális erőfeszítést igényel.
+A javító regressziós tesztelés nem igényel változásokat a meglévő kódbázisban és az alkalmazásba új funkciók hozzáadását.
+Egyszerűen csak a már meglévő funkciókat és azok teszteseteit kell tesztelni, és nem kell újakat létrehozni.
+
+\noindent
+
+Unit Regression Testing (Egység regressziós tesztelés):
+Az egység regressziós tesztelés a regressziós tesztelés elengedhetetlen része, amelyben a kódot elszigetelve teszteljük.
+Az integrációkat és függőségeket kikapcsoljuk az egység regressziós tesztelés során, és az egyes egységekre helyezzük a hangsúlyt.
+Általában alacsony forgalmú és csúcsidőn kívül végzik ezt a tesztelést.
+
+\noindent
+
+Selective Regression Testing (Szelektív regressziós tesztelés):
+A szelektív regressziós tesztelés elemzi a meglévő kódot és mind az új, mind a meglévő kód hatását.
+A közös elemeket, mint a változókat és funkciókat, az alkalmazásba beillesztik, hogy gyors eredményeket kapjanak, anélkül, hogy befolyásolnák a folyamatot.
+
+\noindent
+
+Progressive Regression Testing (Progresszív regressziós tesztelés):
+A progresszív regressziós tesztesetek az elvárások alapján készülnek.
+Amikor csak kisebb termékfejlesztések vannak, az új teszteseteket úgy tervezik, hogy ne befolyásolják a termék meglévő kódját.
+
+\noindent
+
+Complete Regression Testing  (Teljes regressziós tesztelés):
+Néhány kisebb vagy jelentős változtatásnak hatalmas hatása lehet a termékre.
+A teljes regressziós tesztelést ebben az esetben használják, amikor jelentős módosítások vannak a jelenlegi kódban.
+Segít a tesztelési folyamat során történt bármilyen módosítás javításában.
+
+\noindent
+
+Partial Regression Testing (Részleges regressziós tesztelés):
+Amikor új kód kerül hozzáadásra egy meglévő kód bázishoz, akkor a részleges regressziós tesztelést alkalmazzák.
+Ez segít felfedezni a kritikus hibákat a meglévő kódban, és lehetővé teszi a tesztelést anélkül, hogy a rendszer működését befolyásolná.
