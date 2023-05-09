@@ -4,117 +4,40 @@
 
 \noindent
 
-A JavaScriptSchema változtatások után, a NodeAddonGeneratort nem módosítottuk.
-Ennek ellenére a javascriptAddon.node mérete megduplázódott, csupán azért, mert a schéma ekkora bővítésen esett át.
-Sokkal több nodeWrapper lett, mivel bejöttek a typescript általi dolgok is a javascript mellett.
-Természetesen a javascriptes dolgok megmaradtak, így javascriptet ugyanolyan jól tud elemezni, sőt néhány esetben jobban is, mert voltak figyelmetlenségek előző verzióban.
+
+A séma változtatás után, magát a NodeAddonGenerator fájlt nem módosítottam.
+Ennek ellenére a JavaScriptAddon mérete lényegesen megnőtt, mivel a séma nagy bővítésen esett át.
+A JavaScript-es nyelvi elemek mellett a TypeScript-es nyelvi elemek is megtalálhatóak benne.
+Emiatt sokkal több node, és hozzájuk a wrapper-ek generálódtak le.
+A JavaScript-es nyelvi elemek megmaradtak, néhány helyen még javítottunk hibákat is.
+
+\section{JSAN2Lim Bővítések}
 
 \noindent
 
-Mivel a javascriptAddon mérete nőtt, ezáltal a sebesség csökkent.
-Ezt majd egy másik fejezetben jobban kifejtem, célunk az volt, hogy először tudjon typescriptes fileokat és projekteket elemezni a jsan.
+A JSAN tud már TypeScript fájlokat és projekteket is elemezni, emiatt a JSAN2Lim-et is fejleszteni kellett.
+A JSAN2Lim használja a JavaScript és a Lim asg fájlokat egyaránt.
 
-
-\section{JSAN2Lim}
-
-\noindent
-
-A JSAN2Lim egy c++-ban megírt program. A JSAN általi outputot átalakítja lim formátumú fileokra.
-Azért lim formátumú fileokra, mivel a lim az egy környezetfüggetlen nyelv, és sokkal könnyebb ezen metrikákat mérni.
-A JSAN2Lim is egy alprojektje az Analyzer JavaScriptnek.
-Fontos, hogyha a JSAN programot fejlesztik, akkor a JSAN2Lim-et is fejleszteni kell, mivel ha nem, akkor a metrikák nem fognak jól számolódni.
-A JSAN2Lim használja a LimSchemat, ez is ugyanúgy egy $.vpp$ kiterjesztésű file.
-Más logikával van felépítve, mint a JavaScriptSchema, ezért nem is nagyon mennék bele az elemzésébe, csak csupán néhány dolgot fogok használni belőle.
-A JSAN2Lim visiteli az összes nodeot amit a JSAN outputba kirak, ezért JSAN2LimVisitor a fő file neve.
-Minden egyes nodera külön meg kell írni a visit függvényt, hogy tudja a c++ program, hogy mit csináljon ha olyan nodeot kap.
-
-\noindent
-
-A JSAN2Lim működését egy kódrészleten keresztül mutatom be.
-\begin{lstlisting}[caption={ClassDeclaration Visitor}, label={lst:classdeclaration_visitor}, language={CStyle}]
-void JSAN2LimVisitor::visit(const javascript::asg::structure::ClassDeclarationBase& clNode, bool callVirtualBase)
-{
-      VISIT_BEGIN(clNode, callVirtualBase);
-      lim::asg::logical::Class& classLimNode = dynamic_cast<lim::asg::logical::Class&>(createLimNode(clNode, callVirtualBase));
-      fillData(classLimNode, clNode);//sets the name
-      fillMemberData(classLimNode);
-      demangledNameParts.push_back(classLimNode.getName());
-      classStack.push(ClassInfo());
-      classStack.top().classNodeId = classLimNode.getId();
-      if (clNode.getSuperClass() != NULL) {
-      if (javascript::asg::Common::getIsIdentifier(*clNode.getSuperClass())) {
-      javascript::asg::expression::Identifier& superClass = dynamic_cast<javascript::asg::expression::Identifier&>(*clNode.getSuperClass());
-      classStack.top().isSubclass = superClass.getId();
-      }
-      }
-      classStack.top().TLOC = clNode.getPosition().getEndLine() - clNode.getPosition().getLine() + 1;
-      classStack.top().LOC = clNode.getPosition().getEndLine() - clNode.getPosition().getLine() + 1;
-      if (!packageStack.empty()) {
-      lim::asg::logical::Package& packageLimNode = dynamic_cast<lim::asg::logical::Package&>(limFactory.getRef(packageStack.top().packageNodeId));
-      SAFE_EDGE(packageLimNode, Member, lim::asg::logical::Member, classLimNode.getId());
-      }
-      else {
-      common::WriteMsg::write(common::WriteMsg::mlDebug, "Empty packageStack while visiting node %d.", clNode.getId());
-      }
-      addIsContainedInEdge(classLimNode, clNode);
-}
-\end{lstlisting}
-
-A VISIT\_BEGIN definiálva van a file elején, ami a ViscitorAbstractNodesnak a visit metódusa.
-Ezután létrehozok egy classLimNode nevű változót, ami ${lim::asg::logical::Class}$ típusú, ez a limFactoryba található meg.
-Ennek a változónak adunk egy értéket, ami a createLimNode által visszaadott node lesz, és ezt castoljuk erre a típusra.
-
-\noindent
-
-A createLimNode meghívja a limFactoryból a createNode-ot, ami vár paraméterbe egy nodeKind-ot. Ezt a nodeKind-ot mi adjuk meg neki, az alapján, hogy az adott node milyen típusú.
-A nodeKindot a getLimKind függvény határozza meg a következők szerint.
-Megvizsgáljuk, hogy az adott node $getIsClassDeclarationBase()$ vagy $getIsMethodDefinition$ vagy $getIsFunctionDeclarationBase$ vagy sorolhatnám még. Ebből van 10-15db.
-Típustól szerint adjuk meg a nodeKindnak az értékeket, amik lehetnek a következők: ndkClass, ndkMethod, ndkParameter, ndkMethodCall, ndkAttribute, ndkComment, ndkPackage, ndkAttributeAccess, ndkComponent.
-Ezek mind a lim-nek az asgben való típusok és mindet tudja kezelni. Miután beállítottam a nodeKind értékét, szimplán returnolom.
-Ha megkaptuk a nodeKind értékét, akkor ezt létrehozza a createLimNode függvény. Állít be ennek pozíciót és returnoli a *limNode-ot.
-
-\noindent
-
-Ezáltal most megkaptuk a classLimNode-ot, hiszen a nodeKind az ndkClass lett és ennek megfelelően hozta létre a lim.
-Ezután meghívjuk a filldata függvényt, első paraméternek magát a létrehozott classLimNodeot, másodiknak magát a nodeot adjuk meg.
-A JSAN által kiadott outputot $.jssi$ kiterjesztésű fileon végig megy. Visitorok segítségével oldja meg ezt.
-Ebben a filldatában beállítom a limnode láthatóságát, nyelvét (ami konstans javascript), azt, hogy abstract-e.
-Lekérem a nodeIdját és a lastLimMemberNodeId illetve a lastLimScopeNodeIdba pusholom. Ezután beállítom a classKindját, ami clkClass lesz (ezt is a factoryból).
-Aztán a nevét szeretném beállítani, a node-nak lekérem azt,hogy identifier-e, vagy sem. Ha nem null, akkor lekérem az identifiert és $identifier.getName()$el lekérem a nevét és be is állítom a limNodenak a $setName()$ függvénnyel.
-Ha az identifier null, akkor a $limNode.setIsAnonymous()$-t beállítom true értékre és adok neki egy $"anonymousClass"+ ss.str()$ ahol az ss az egy stringstream, szimplán egy counter, hogy eddig hány anonymous class volt.
-Ezután megvizsgálom, hogy e methodstack empty-e, ha nem, akkor van szülője, ezért a SAFE\_EDGE function hozzáadok egy eegy edget a parent és a jelenlegi limnode-hoz.
-Ezt ugyanúgy megvizsgálom packageStackre, ha nem empty, akkor ugyanezt elvégzem csak a parent most más lesz.
-Végezetül az $addIsContainedInEdge$ függvényt meghívom a limnode és a jsNode paraméterekkel.
-
-\noindent
-
-Ezután a $fillMemberData()$ függvényt hívjuk meg, ami igazából csak pozíciót állít be, illetve a neven picit változtat.
-Utána a classStack-hez hozzáadja az adott osztály tulajdonságait, beállítja a parent classt ha van, pozíciót állít be, és a végén ugyanúgy meghívjuk a $addIsContainedInEdge$ a classLimNode és a clNodeal.
-Ez a procedúra történik minden egyes nodenál a JSAN2Limben.
-
-\subsection{Bővítések}
-
-\noindent
-
-Mivel a JSAN mostmár tud typescriptet is elemezni, emiatt a JSAN2Lim-et is fel kell erre készíteni, hogyha typescriptes nodeokat kap, akkor tudja, hogy mit kell azzal csinálni.
-A javascript asg-t is használja a JSAN2Lim, ezért sok helyen először változtatni kellett néhány dolgon.
+Több helyen is át kellett írni a JSAN2Lim-et:
 \begin{itemize}
-      \item Néhány visitornál a várt paraméter típusát átírni, például Classról ClassDeclarationBase-re, hiszen a schémában változtatás volt.
-      \item Néhány visitornál a várt paraméternél a helyét az adott nodenak. Például a RestElement már nem a statement packagen belül van, hanem a parameteren belül.
-      \item A Pattern mint node megszűnt, Parameterre lett átnevezve, és a helye is megváltozott, statementből átkerült parameter packagebe
-      \item Típus lekérdezésnél a $getIsClass()$ helyett például $getIsClassDeclarationBase()$ lett, változott ez is a JavaScriptSchema miatt.
+      \item Több visitor-nál a várt paraméter típusát átírni, például Class-ról ClassDeclarationBase-re, mivel a sémában már nem Class-ként, hanem ClassDeclarationBase-ként szerepel.
+      \item Több visitor-nál a várt paraméternél helyét meg kellett változtatni egyes node-nál.
+      Például a RestElement eddig a Statement package-en belül helyezkedett el, de a bővítés során átkerült a Parameter package-be.
+      \item A Pattern, mint node, Parameter-re lett átnevezve. A helye is megváltozott, Statement package-ből átkerült a Parameter package-be.
+      \item Típus lekérdezésnél a \texttt{getIsClass} helyett \texttt{getIsClassDeclarationBase} kellett használni.
 \end{itemize}
 
-A bővítések, hogy miket adtam hozzá a JSAN2LImhez:
+A bővítések, hogy mikkel bővítettem a JSAN2Lim-et:
 \begin{itemize}
-      \item Az új Kindokat amiket felvettünk a JavaScriptSchemaban. A következőképp: $std::string getEnumText(javascript::asg::ASTNodeTypes);$
-      \item Új visitorok írása. TSEnumDeclaration, TSImportEqualsDeclaration, TSInterFaceDeclaration, és még sok másik, ezekhez a filldatákat is megírni
-      \item kindStrings tömb kiegészítése a typescriptes nodeokkal
-      \item Bugok kijavítása, a VariableDeclarationnél nem vette észre az összes declarationt, főleg metóduson belül.
-      \item A $getLimKind()$ function bővítése $getIsTSTypeAliasDeclaration()$, $getIsTSInterfaceDeclaration()$, $getIsTSAbstractMethodDefinition()$ és $getIsTSAbstractPropertyDefinition()$ else if ágakkal.
-      \item TSEmptyBodyFunctionExpression debugolása, sok helyen lehalt a program emiatt.
+      \item Több kind-ot is létrehoztunk a sémában, ezekkel bővíteni kellett a JSAN2Lim-et.
+      \item Új node visitor-ok írása. Mint például a TSEnumDeclaration, TSImportEqualsDeclaration, TSInterFaceDeclaration, és még TypeScript node amihez kell visitor.
+      A visitor-hoz a fillData függvényeket is megírni.
+      \item JSAN2Lim-ben a kindStrings tömb kiegészítése TypeScript-es node-okkal.
+      \item Hibák kijavítása, a VariableDeclaration-nél nem detektálta az összes változó deklarálást, főleg metódusokon belül.
+      \item A \texttt{getLimKind} metódus bővítése \texttt{getIsTSTypeAliasDeclaration}, \texttt{getIsTSInterfaceDeclaration},
+      \texttt{getIsTSAbstractMethodDefinition} és \texttt{getIsTSAbstractPropertyDefinition} esetekkel.
+      \item TSEmptyBodyFunctionExpression osztály hibajavítása, hiszen több helyen is leállt a program emiatt.
 \end{itemize}
-
 
 \section{Ast binder optimalizálás}
 
