@@ -4,35 +4,16 @@
 
 \noindent
 
-A szakdolgozatom során sikerült elérnem azt, hogy az Ast binder közel tízszer gyorsabban fusson le nagyobb projektre, mint ezelőtt.
-Leteszteltem ugyanarra a nagy projektre az eredeti JSAN lefutását és az én általam átírt lefutását. Ezt \Aref{lst:jsan_before_after_comparison} kódrészleten láthatjuk.
-Kisebb projektekre körülbelül ötszörös gyorsulás van.
-Lefuttattam egy nagyobb projektre a jsan-t, az optimalizált és az optimalizálatlan verzióval, hogy jobban lássuk a különbséget. A következő eredmények születtek:
+A szakdolgozatom során sikerült elérnem azt, hogy a JavaScript-es nyelvi séma tartalmazza a TypeScript-es nyelvi elemeket is.
+Továbbá a JSAN2Lim-et sikerült kibővíteni TypeScript támogatással.
+Mindeközben a regressziós teszteléseket sikeresen frissítettem és validáltam, amit később mások is jóvá hagytak.
+Legvégül sikerült az AST binder metódusát optimalizálnom, sokkal gyorsabban fut le, mint ezelőtt.
 
-\begin{lstlisting}[caption={JSAN lefutási idő előtte és utána}, label={lst:jsan_before_after_comparison}]
-Optimalizalt_verzio:
-Binding VU: 71599/71599
-VU binding: 1:39.140 (m:ss.mmm)
-
-Optimalizalatlan_verzio:
-Binding VU: 71599/71599
-VU binding: 42:31.211 (m:ss.mmm)
-\end{lstlisting}
-
-Ugyanazt az outputot adja mind a kettő program, szóval csak gyorsaságban és memóriahasználatban változott sokat.
-
-Emellett a JavaScriptSchema újraírása is sikeres volt, emiatt a JSAN tud typescriptes kódokat elemezni.
-JSAN2Limet sikeresen módosítottam, hogy a JSAN által kiadott outputot sikeresen limmé alakítsa.
 \section{Jövőbeli tervek}
 
 \noindent
 
-JavaScriptSchema bővítése sok időbe telt, mivel se dokumentáció, se tapasztalat nem volt. Ezután még a JSAN2Lim átírás is sok időbe került.
-Eközben a typescript-eslint github repo amit használtunk a bővítésre, frissült, sok új funkciót hoztak be.
-Rengeteg változtatás volt a typescript résznél, de a schémát nem tudtuk még naprakészre hozni, mivel voltak ennél fontosabb feladatok.
-Egyik jövőbeli terv az, hogy a schémát up to datere hozzam, mivel már van hozzá dokumentáció is, meg nagyjából én is írtam, ezért nem lesz ez annyi idő, mint volt az elején az újraírása.
-
-\noindent
-
-Végül a JSAN programra még bőven ráfér az optimalizálás, mivel csak az ast bindert optimalizáltuk, rengeteg helyen feleslegesen van bejárva az ast.
-Ez a másik jövőbeli terv.
+Rengeteg változtatás volt a TypeScript résznél, de a sémát nem tudtuk még naprakészre hozni, mivel voltak ennél fontosabb feladatok.
+Mint például az AST binder optimalizálása, vagy a JSAN2Lim továbbfejlesztése.
+Ebből kifolyólag jelenleg a séma nem naprakész.
+Mivel a szakdolgozatom elkészítése során megfelelő jártasságra tettem szert, így a későbbi bővítést az eddigiektől gyorsabban el tudnám végezni.
