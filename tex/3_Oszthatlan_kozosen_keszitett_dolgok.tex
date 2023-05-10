@@ -4,7 +4,7 @@
 
 \noindent
 
-Az eddigi JavaScript nyelvi séma (továbbiakban: séma), ami csak javascript nyelvű projekteket és fájlokat elemzett, a javascript hivatalos oldala$^{~\cite{javascript}}$ alapján készült.
+Az eddigi JavaScript nyelvi séma (továbbiakban: séma), ami csak JavaScript nyelvű projekteket és fájlokat elemzett, a JavaScript hivatalos oldala$^{~\cite{javascript_language}}$ alapján készült.
 \Aref{chap:nyelvi_sema} fejezetben ami ábrák láthatóak, azok már az átírt sémából lettek kifotózva.
 
 \noindent
@@ -19,7 +19,7 @@ Fejlesztés során dokumentáltuk a lépések nagy részét.
 
 \noindent
 
-Minden egymásra épül a sémában, emiatt a műkődést nem tudtuk az elején letesztelni, csak miután több package is készen lett.
+Minden egymásra épült a sémában, emiatt a műkődést nem tudtuk az elején letesztelni, csak miután több package is készen lett.
 Megfigyelhető \aref{lst:asg_file_export_all_declaration} kódrészleten, hogy az ExportAllDeclaration több mindenből öröklődik és sok attribútuma van.
 Az ExportAllDeclaration egyik attribútumának a típusa az ImportAttribute.
 Ehhez az ImportAttribute osztályt is le kellett fejleszteni a sémában.
@@ -55,5 +55,5 @@ Javítottuk a problémát, és ezek után hibamentesen és jól letudtuk futtatn
 
 \noindent
 
-Továbbá sok nyelvi elemet a TypeScriptben nem ismertünk.
-Tanulmányozni kellett jobban a TypeScript programozási nyelvet, hogy tesztek átnézése során tudjuk mit elemzett le jól és mit nem.
+Továbbá sok nyelvi elemet a TypeScript-ben nem ismertünk.
+Tanulmányozni kellett jobban a TypeScript programozási nyelvet$^{~\cite{fenton2014pro, cherny2019programming, nance2014typescript, 10.1007/978-3-662-44202-9_11}}$, hogy tesztek átnézése során tudjuk mit elemzett le jól és mit nem.

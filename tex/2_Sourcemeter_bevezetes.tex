@@ -13,10 +13,10 @@ Az ilyen típusú elemzés során gyakran felhasználnak különböző szabályo
 
 \noindent
 
-A statikus elemzés során absztrakt szemantikus gráf (ASG) készül a forráskód nyelvi elemeiből.
-Ezután az ASG-t különböző eszközökkel dolgozzák fel a csomagban annak érdekében, hogy kiszámítsák a metrikákat (LLOC$^{~\cite{siket2014differences}}$, NLE vagy NOA),
+A statikus elemzés során Absztrakt Szemantikus Gráf (ASG) készül a forráskód nyelvi elemeiből.
+Ezután az ASG-t különböző eszközökkel dolgozzák fel a csomagban annak érdekében, hogy kiszámítsák a metrikákat (LLOC$^{~\cite{siket2014differences, bakota2011probabilistic}}$, NLE vagy NOA),
 azonosítsák az ismételt kódrészleteket (másolás-beszúrás; klónok), a kódolási szabályszegéseket, stb.
-A SourceMeter képes elemzést végezni olyan forráskódon,amely megfelel a Java 8 és korábbi verzióinak, a C/C++,
+A SourceMeter képes elemzést végezni olyan forráskódon, amely megfelel a Java 8 és korábbi verzióinak, a C/C++,
 az RPG III és az RPG IV verzióinak (beleértve a szabadon formázottakat), a C\# 6.0 és korábbi verzióinak, valamint a Python 2.7.8 és korábbi verzióinak.
 A C/C++ esetében a SourceMeter támogatja az ISO/IEC 14882:2011$^{~\cite{sourcemeter2015}}$ nemzetközi szabványt, amelyet kiegészítettek az ISO/IEC 14882:2014 új funkcióival, és a C nyelvet az ANSI/ISO 9899:1990, az ISO/IEC 9899:1999 és az ISO/IEC 9899:2011 szabványok határozzák meg.
 Az alapértelmezett funkciókon túl, a GCC és a Microsoft által meghatározott kiterjesztések is támogatottak.
@@ -48,6 +48,9 @@ Az ilyen eszközök használata segíthet az észlelt hibák javításában és 
 A SourceMeter for JavaScript projekt több alprojektet is magába foglal, amelyek különböző részfeladatokra specializálódnak.
 
 \subsection{Nyelvi séma bevezetés}\label{chap:nyelvi_sema}
+
+\noindent
+
 A JavaScript nyelvi séma(továbbiakban: séma)$^{~\cite{ferenc2002columbus}}$  egy UML Diagramhoz hasonlító séma.
 A Visual Paradigm(továbbiakban: vpp) alkalmazással szerkeszthető.
 Azért szerkesztjük a sémát vpp-ben, mivel a többi nyelvi változat esetében is így volt, és van koncerter, ami ebből a vpp fájlból létrehozza a C++ alap fájlokat, amiket az elemző programok tudnak használni.
@@ -59,7 +62,7 @@ A felépítése a következőképpen néz ki:
       \includegraphics[width=0.4\textwidth]{JavaScriptSchema_struktura.png}
 \end{figure}
 
-\Aref{fig:JavaScriptSchema_struktura} ábrán a ProjektNlv/Model/Package-ek struktúra figyelhető meg.
+\Aref{fig:JavaScriptSchema_struktura} ábrán a ProjektNév/Model/Package-ek struktúra figyelhető meg.
 A projekt neve JavaScript, ezen belül található egy model, amit javascript-nek hívnak.
 A modellen belül találhatóak meg a package-ek.
 A Package-ek a TypeScript séma $^{~\cite{typescript-eslint}}$ alapján lettek elnevezve.
@@ -75,6 +78,9 @@ A package-ek a következőképpen épülnek fel:
 \Aref{fig:base_vpp} ábrán a Base, Node, Positioned, Comment, System, Named, BaseNode, BaseToken, Program, ProgramStatement és a Token osztályok találhatóak.
 A Base osztályból öröklődik minden osztály.
 A Base osztály rendelkezik id attribútummal, ami NodeId típusú.
+
+\noindent
+
 Az absztrakciót zöld háttérszínnel jelöltük.
 A séma könnyebb bővíthetősége és olvashatósága miatt jeleztük így, illetve más nyelvi sémákban is ezt a logikát követjük.
 Más package-ekben lévő definiálást szürke háttérszínnel, ugyanabban a package-ben lévő definiálást világosszürke háttérszínnel jelöltük.
@@ -95,7 +101,7 @@ Régebbi sémának a Base package-ét használjuk, BaseNode és BaseToken osztá
 \noindent
 
 Mivel a Base package egyedi a mi esetünkben, ezért kitérnék a Declaration package-re is.
-A Declaration package-n belül az ExportAllDeclaration osztályt mutatom be.
+A Declaration package-en belül az ExportAllDeclaration osztályt mutatom be.
 
 \begin{lstlisting}[caption={ExportAllDeclaration TypeScript megvalósítása},label={lst:ExportAllDeclaration}, language={JavaScript}]
 export interface ExportAllDeclaration extends BaseNode {
@@ -117,7 +123,7 @@ export interface ExportAllDeclaration extends BaseNode {
 
 Az ExportAllDeclaration osztály öröklődik a DeclarationStatement osztályból, ami öröklődik a BaseNode osztályból.
 Ezért az ExportAllDeclaration egyaránt öröklődik a BaseNode osztályból.
-\Aref{lst:ExportAllDeclaration} kódrészletben ez az extends BaseNode-al van jelezve.
+\Aref{lst:ExportAllDeclaration} kódrészletben ez az \texttt{extends BaseNode}-al van jelezve.
 A főbb osztályok a BaseNode alatt találhatóak az ábrán.
 Az ábra jobb oldalán lévő osztályok, amik sötét- és világosszürkével vannak jelölve, az attribútumok.
 Az ExportAllDeclaration osztály öröklődik a Statement, DeclarationStatement, Node és a ProgramStatement osztályokból.
@@ -152,17 +158,16 @@ Ha ExportAndImportKind-ot adunk meg egy attribútum típusának, akkor az attrib
 
 \noindent
 
-Ahhoz, hogy tudjuk használni a sémát, először ki kell exportálni. Ezt a vpp segítségével tehetjük meg, egy xml formátumú fájlba exportáljuk az egész projektet.
-Ezután ezt a fájlt átkonvertáljuk egy asg kiterjesztésű fájlra.
-A SourceMeter alprojektei közé tartozik egy úgynevezett UmlToAsg.
-Ez a projekt egy xml fájlból egy asg fájlt generál.
-Az UmlToAsg projektet a SchemaGenerator segítségével tudjuk legenerálni.
-A SchemaGenerator C++ nyelven megírt eszköz.
+A séma használata előtt először ki kell exportálni a projektet. A vpp segítségével tehető meg, egy xml formátumú fájlba exportálódik egész projekt.
+Ezután ezt a fájlt át kell konvertálni ASG kiterjesztésű fájlra.
+UmlToAsg eszközzel tehető ez meg, ami a SourceMeter alprojektjei közé tartozik.
+Ez a projekt egy xml fájlból egy ASG fájlt generál.
+Az UmlToAsg projekt a SchemaGenerator által generálódik.
+A SchemaGenerator C++ nyelven megírt eszköz, a SourceMeter alprojektjei közé tartozik.
 Több mindent is generál C, C++, vagy Java nyelven.
-A SchemaGenerator is a SourceMeter alprojektei közé tartozik.
-A legenerált asg fájl elején a következő sorok láthatóak:
+A generált ASG fájl elején a következő sorok láthatóak:
 
-\begin{lstlisting}[caption={Asg fájl első sorai},label={lst:asg_file_eleje}, language={JavaScript}]
+\begin{lstlisting}[caption={ASG fájl első sorai},label={lst:asg_file_eleje}, language={JavaScript}]
 NAME = javascript;
 APIVERSION = 0.3.1;
 BINARYVERSION = 0.3.1;
@@ -172,19 +177,19 @@ CSIHEADERTEXT = JavaScriptLanguage;
 A verziókat kézzel tudjuk átírni abban a fáljban ami generálja ezt, ez egy C++ fájl, a SchemaGeneratorban található meg.
 Ezután a Kinds package tartalmát írja bele a következőképpen:
 
-\begin{lstlisting}[caption={Asg fájl kind},label={lst:asg_file_kinds}, language={JavaScript}]
+\begin{lstlisting}[caption={ASG fájl kind},label={lst:asg_file_kinds}, language={JavaScript}]
 KIND ASTNodeTypes (ant) {
       FunctionDeclaration;
       BlockStatement;
       ClassDeclaration;}
 \end{lstlisting}
 
-A 3 karaktert, amit minden konstans elé írtunk, kikerült paraméterbe és csak az utáni stringet írta át.
+A 3 karakter, amit minden konstans előtt szerepel, azok kikerülnek paraméterbe és csak az utáni stringet írta át az ASG fájlba.
 Ugyanígy jár el a többi enumnál is.
-Ha az összes enumot beleírta, akkor a többi package-et kezdi el bele írni a fájlba. \Aref{fig:JavaScriptSchema_struktura} alapján megy sorba.
+Ha az összes enumot beleírta, akkor a többi package-et kezdi el bele írni a fájlba. \Aref{fig:JavaScriptSchema_struktura} alapján halad sorban.
 Példának a Declaration package-et mutatom be, azon belül is az ExportAllDeclaration osztályt.
 
-\begin{lstlisting}[caption={Asg fájl ExportAllDeclaration},label={lst:asg_file_export_all_declaration}, language={JavaScript}]
+\begin{lstlisting}[caption={ASG fájl ExportAllDeclaration},label={lst:asg_file_export_all_declaration}, language={JavaScript}]
 SCOPE declaration {
       NODE DeclarationStatement : virtual base::BaseNode [ABSTRACT] {
       }
@@ -202,9 +207,9 @@ A Scope-on belül az osztályokat gráf csomópontnak (továbbiakban: node) ért
 A node-nak kettő különféle attribútuma lehet, ATTR és EDGE TREE.
 Akkor konvertálja ATTR-ra az attribútumot, ha az a DataStructures package-ben deklarálva lett. Egyéb esetben EDGE TREE-vé konvertál.
 Az EDGE TREE után álló szám vagy csillag, az adott attribútum multiplicitását jelenti.
-A vagyolást egy | jellel jelzi.
+A vagyolást egy \texttt{|} jellel jelzi.
 Az öröklődést kettősponttal jelzi.
-Felsorolásszerűen írta át, ha valami másból származik, akkor packageNev::osztalyNev szerint.
+Felsorolásszerűen írta át, ha valami másból származik, akkor \texttt{packageNev::osztalyNev} alapján.
 \Aref{fig:declaration_vpp}as ábrán látható, hogy mit hogyan írt át.
 
 \subsection{JavaScriptAddon bevezetés}\label{chap:javaScriptAddon_bevezetes}
@@ -216,9 +221,9 @@ A JavaScriptAddon a SchemaGenerator által generált fájl.
 Ezeknek a node-oknak a SchemaGenerator generál külön egy WrapperHeader és egy WrapperCC fájlt.
 A SchemaGenerator továbbá generál Factory.cc és a hozzátartozó header fájlt. A Factory.cc-t bővebben taglalom \aref{lst:factory_cc} kódrészletnél.
 A WrapperCC, Factory.cc és a hozzájuk tartozó header fájlok összeolvasztása eredményezi a JavaScriptAddon fájlt.
-A JavaScriptAddon fájl generálás menetét a NodeAddonGenerator fájlban írjuk le.
-A SchemaGenerator main.c fájlba beimportáljuk a NodeAddonGenerator összes metódusát, aztán ezeket a metódusokat használva legeneráljuk a JavaScriptAddon fájlt.
-A $-genNodeAddon$ kapcsolóval fogja legenerálni a JavaScriptAddon fájl a SchemaGenerator.
+A JavaScriptAddon fájl generálás menetét a NodeAddonGenerator fájlban található.
+A SchemaGenerator main.c fájlba beimportálja a NodeAddonGenerator összes metódusát, aztán ezeket a metódusokat használva legenerálja a JavaScriptAddon fájlt.
+A \texttt{-genNodeAddon} kapcsolóval fogja legenerálni a JavaScriptAddon fájlt a SchemaGenerator.
 A SchemaGenerator main.c fájl elején előszőr vizsgál a megadott kapcsolókra az alábbi módon:
 
 \begin{lstlisting}[caption={SchemaGenerator kapcsoló vizsgálás},label={lst:schemagenerator_argv_genNodeAddon}, language={CStyle}]
@@ -227,10 +232,10 @@ if(!strcmp(argv[i], "-genNodeAddon")){
 }
 \end{lstlisting}
 
-Ha az argumentumban megtalálható a genNodeAddon, akkor az options.generateNodeAddon-t igazra állítja.
-Az alapértelmezett értéke az options.generateNodeAddon-nak hamis.
-Több fájl generálás után, ami kell több program működéséhez, megvizsgálja az options.generateNodeAddon-t.
-Ha az options.generateNodeAddon hamis, akkor nem fog semmi se történni.
+Ha az argumentumban megtalálható a \texttt{-genNodeAddon} kapcsoló, akkor az \texttt{options.generateNodeAddon}-t igazra állítja.
+Az alapértelmezett értéke az \texttt{options.generateNodeAddon}-nak hamis.
+Több fájl generálás után, ami kell több program működéséhez, megvizsgálja az \texttt{options.generateNodeAddon}-t.
+Ha az \texttt{options.generateNodeAddon} hamis, akkor nem fog semmi se történni.
 
 \begin{lstlisting}[caption={SchemaGenerator JavaScriptAddon generálás},label={lst:schemagenerator_genNodeAddon_check}, language={CStyle}]
 if (createAndEnterDirectory(SOURCE_NODE_ADDON_DIR_NAME)) {
@@ -259,7 +264,7 @@ fprintf(f, "    \"install\": \"node-gyp configure && node-gyp build -j 8\"\n");
 
 \Aref{lst:nodeAddonGenerator_package_json} kódrészleten látható, hogy a node-gyp build segítségével fog történni a buildelés.
 A node-gyp egy eszköz, amely összeállítja a Node.js Addonokat. A Node.js Addonok natív Node.js modulok, amelyeket C vagy C++ nyelven írnak.
-Miután az ilyen modulokat eszközökkel, például a node-gyppel lefordították, funkcióik elérhetők lesznek a $require()$ segítségével, ahogy bármely más Node.js modul esetében.
+Miután az ilyen modulokat eszközökkel, például a node-gyppel lefordították, funkcióik elérhetők lesznek a \texttt{require()} segítségével, ahogy bármely más Node.js modul esetében.
 
 \noindent
 
@@ -287,9 +292,9 @@ fprintf(f, "inc/%sWrapper.h\"\n", node->name );
 return true;
 \end{lstlisting}
 
-Ha a jelenlegi node absztrakt, akkor nem ír semmit a fáljba.
+Ha a jelenlegi node absztrakt, akkor nem ír semmit a fájlba.
 Ha nem absztrakt, akkor \aref{lst:addoncc_wrapper_includes_implementation} kódrészlet alapján importálja a node-nak a header fájl relatív útvonalát.
-A \texttt{node->name} több értéket is vehet fel, például FunctionDeclaration, ClassDeclaration, ezek megtalálhatóak az asg fájlban.
+A \texttt{node->name} több értéket is vehet fel, például FunctionDeclaration, ClassDeclaration, ezek megtalálhatóak az ASG fájlban.
 Ezután ez a bejárás még egy alkalommal végrehajtódik. Ebben az esetben a wrapperIniteket ír az addonCC fájlba.
 
 \begin{lstlisting}[caption={generateWrapInit leimplementálása}, label={lst:addoncc_wrapper_inits_implementation}, language={CStyle}]
@@ -310,7 +315,7 @@ ami a destructor, New, SaveAST, LoadAST, Clear, getRoot és az összes nodeWrapp
 \noindent
 
 A generateFactoryWrapperSource a Factory.cc fájlt generálja le.
-DECLARE\_NAPI\_METHOD-okat hoz létre, az összes nodeWrapper fájlnak.
+\texttt{DECLARE\_NAPI\_METHOD}-okat hoz létre, az összes nodeWrapper fájlnak.
 
 \begin{lstlisting}[caption={Factory.cc fájl}, label={lst:factory_cc}, language={CStyle}]
 napi_property_descriptor props [] = {
@@ -326,7 +331,7 @@ Az inc mappában találhatóak a header fájlok minden egyes nodeWrapper-nek, az
 
 \noindent
 
-A SchemaGenerator legenerálj az ExportAllDeclarationWrapper.h és az ExportAllDeclaration.cc fájlokat.
+A SchemaGenerator legenerálja az ExportAllDeclarationWrapper.h és az ExportAllDeclaration.cc fájlokat.
 A header fájlban létrehozza az ExportAllDeclarationWrapper osztályt, ami öröklődik a BaseWrapperből. A BaseWrapper alap Wrapper osztály.
 Három publikos metódust generál le, az Init-et, a Destructor-t és a NewInstance-t.
 Ezen felül több private metódust is.
@@ -347,7 +352,7 @@ Minden nodeWrapper rendelezik setPath, setPosition, setType és addComments met�
 
 \noindent
 
-Az ExportAllDeclaration.cc fájlt ugyanúgy generálja le, mint a Factory.cc fájlt. DECLARE\_NAPI\_METHOD-okat generál, a setExported, setSource, setType és a többi metódushoz.
+Az ExportAllDeclaration.cc fájlt ugyanúgy generálja le, mint a Factory.cc fájlt. \texttt{DECLARE\_NAPI\_METHOD}-okat generál, a setExported, setSource, setType és a többi metódushoz.
 Ezután az összes metódust megvalósításra kerül.
 
 \subsection{JSAN2Lim bevezetés}
@@ -356,7 +361,8 @@ Ezután az összes metódust megvalósításra kerül.
 
 A JSAN2Lim C++ programozási nyelvben megírt program. A JSAN általi eredményt alakítja át nyelvfüggetlen (továbbiakban: LIM) formátumú fájlokra.
 Azért LIM formátumú fájlokra alakít át, mivel egy nyelvfüggetlen modellen sokkal könnyebb metrikákat mérni.
-A JSAN2Lim függ a JSAN programtól, hiszen a JSAN eredményeit alakítja át, tehát, ha a JSAN programot változás éri, akkor a JSAN2Lim programot is változtatni kell, különben nem lesznek pontosak a metrika mérések.
+A JSAN2Lim függ a JSAN programtól, hiszen a JSAN eredményeit alakítja át.
+Ha a JSAN programot változás éri, akkor a JSAN2Lim programot is változtatni kell, különben nem lesznek pontosak a metrika mérések.
 A JSAN2Lim használja a LimSchema-t. A LimSchema hasonlóan van felépítve, mint a JavaScript nyelvi sémája.
 A JSAN2Lim bejárja az összes node-ot ami megtalálható a JSAN általi eredmény fájlban.
 Minden node-ra külön meg kell írni a bejáró (továbbiakban: visit) függvényt.
@@ -382,7 +388,7 @@ if (!packageStack.empty()) {
 addIsContainedInEdge(classLimNode, clNode);
 \end{lstlisting}
 
-A VISIT\_BEGIN a ViscitorAbstractNodes programnak a visit metódusa.
+A \texttt{VISIT\_BEGIN} a ViscitorAbstractNodes programnak a visit metódusa.
 Ezután létrejön a classLimNode változó, ami \texttt{lim::asg::logical::Class\&} típusú.
 Ez a típus a LimSchema-ban található meg, a logical package-ben.
 A változónak a createLimNode metódus által visszaadott node lesz az értéke.
@@ -391,9 +397,9 @@ Ezt az értéket konvertáljuk át a erre a \texttt{lim::asg::logical::Class\&} 
 \noindent
 
 A createLimNode függvény meghívja a createNode függvényt. Ez a függvény vár paraméterbe egy nodeKind-ot.
-A nodeKind az adott node típúsát jelöli.
+A nodeKind a node típúsát jelöli.
 A nodeKind-ot a getLimKind függvény határozza meg.
-A getLimKind függvény megvizsgálja, hogy az adott node \texttt{getIsClassDeclarationBase} vagy \texttt{getIsMethodDefinition} vagy \texttt{getIsFunctionDeclarationBase}.
+A getLimKind függvény megvizsgálja, hogy a node \texttt{getIsClassDeclarationBase} vagy \texttt{getIsMethodDefinition} vagy \texttt{getIsFunctionDeclarationBase}.
 A nodeKind értéke típustól függően adódik meg.
 Ezek az értékek a következők lehetnek: ndkClass, ndkMethod, ndkParameter, ndkMethodCall, ndkAttribute, ndkComment, ndkPackage, ndkAttributeAccess, ndkComponent.
 Ezek az értékek mind a LimSchema-ban vannak deklarálva. A nodeKind értékadása után a függvény visszaadja ezt a változót és tovább használja a visitor-ban.
@@ -402,15 +408,15 @@ Ezután, a createLimNode függvény létrehozza a megfelelő node-ot a nodeKind-
 \noindent
 
 Ebben az esetben a nodeKind az ndkClass értéket kapja meg.
-A classLimNode értékadás után meghívódik a filldata függvény.
+A classLimNode értékadás után meghívódik a fillData függvény.
 Kettő paramétert vár, classLimNode-ot, és a node-ot.
-A filldata a JSAN általi adott eredményet bejárja, visitorok segítségével.
-A filldata-ban beállítódik a limnode láthatósága, nyelve, az hogy absztrakt-e és a classKind-ja, ami jelen esetben clkClass értéket fog felvenni.
+A fillData a JSAN általi adott eredményet bejárja, visitorok segítségével.
+A fillData-ban beállítódik a limnode láthatósága, nyelve, az hogy absztrakt-e és a classKind-ja, ami jelen esetben clkClass értéket fog felvenni.
 
 Ezután beállítódik a limnode neve. Ha a node-nak volt identifier-e, akkor a \texttt{getName} függvénnyel beállítódik a limnode neve különben \texttt{anonymousClass} érték állítódik be.
 Ezután megvizsgálja, hogy a methodstack (ami egy stack és metódusokat tartalma) üres-e.
 Ha nem üres, akkor létezik szülője, ezért a SAFE\_EDGE metódussal hozzáadódik egy csúcs a szülő és a jelenlegi limnode között.
-Ezt uganúgy megvizsgálja a  packageStack-re (ami egy stack és csomagokat tartalmaz), ha nem üres, akkor ugyanezt elvégzem csak a szülő más lesz.
+Ezt uganúgy megvizsgálja a  packageStack-re (ami egy stack és csomagokat tartalmaz), ha nem üres, akkor ugyanezt elvégzi csak a szülő más lesz.
 Legvégül az \texttt{addIsContainedInEdge} függvény meghívódik a limnode és a jsNode paraméterekkel.
 
 \noindent
