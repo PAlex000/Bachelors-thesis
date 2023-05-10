@@ -4,13 +4,13 @@
 
 Szakdolgozatomban a SourceMeter for JavaScript továbbfejlesztése volt a cél.
 A JavaScript elemzése mellett TypeScript nyelvű fájlokat és projekteket is elemezni kellett.
-Ez azt eredményezte, hogy gyökerestül át kellett írni, annak érdekében,
+Ebből adódik az, hogy gyökerestül át kellett írni az eszközt, annak érdekében,
 hogy JavaScriptet és TypeScriptet is tudjon egyaránt elemezni.
 
 \noindent
 
 A SourceMeter for JavaScript projekten többen is fejlesztettek egyszerre, ezáltal voltak átfedések, oszthatatlan részek.
-A projekt több része is egymásra épül, ezért kiemelten fontos volt a csapatmunka egyes részeknél, hogy a projekt eredményesen és hatékonyan haladjon.
+A projekt néhány része is egymásra épül, ezért kiemelten fontos volt a csapatmunka egyes részeknél, hogy a projekt eredményesen és hatékonyan haladjon.
 Az eredményes csapatmunka magában foglalja az eredmények és az előrehaladás folyamatos kommunikálását,
 ami azt jelenti, hogy mindketten megértjük, hogy milyen célkitűzések vannak a projektben,
 és rendszeresen jelentést adunk egymásnak az elvégzett munkáról és az elért eredményekről.
@@ -29,15 +29,14 @@ Ez a JavaScript nyelvi séma (továbbiakban:séma) szerkesztése volt. Ezt \aref
 \noindent
 
 A séma szerkesztése után a JavaScript Analyzer To Lim (továbbiakban JSAN2Lim) továbbfejlesztése volt a feladatom.
-A továbbfejlesztés C++, C nyelv és TypeScript séma$^{~\cite{typescript-eslint}}$ ismeretét igényelte meg.
-Emiatt a fejlesztés előtt tanulmányoznom kellett ezeket.
+A továbbfejlesztés C++, C nyelv, TypeScript nyelvi elemek$^{~\cite{fenton2014pro, cherny2019programming, nance2014typescript, 10.1007/978-3-662-44202-9_11}}$ és a TypeScript séma$^{~\cite{typescript-eslint}}$ ismeretét igényelte meg.
+Emiatt a fejlesztés előtt tanulmányozni kellett ezeket.
 
 \noindent
 
 A JSAN2Lim fejlesztése után a JavaScript elemzőnek (JavaScript Analyzer, továbbiakban: JSAN) a binder függvényét kellett optimalizálnom.
-Először értelmeznem kellett a kódot, át kellett néznem az AST-t, illetve több adatszerkezetet is, gyorsasági szempontból.
+Először megérteni kellett a kódot, át kellett nézni az Abstract Syntax Tree-t (továbbiakban: AST), illetve több adatszerkezetet is, gyorsasági szempontból.
 
 \noindent
 
 Legvégül bővítettem a regressziós teszteket új projektek behozatalával. Ezt \aref{chap:Regteszt_frissítés} fejezetben taglalom.
-% Ezeknek az outputjait megnéztem, hogy jó eredményt ad-e, itt még volt egy kis bugfixing a JSAN2Limben és a Schémában.
