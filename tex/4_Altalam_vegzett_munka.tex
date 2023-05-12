@@ -1,4 +1,4 @@
-\chapter{Általam változtatott programok}\label{chap:altalam_valtoztatott_programok}
+\chapter{Általam végzett feladatok az elemzőeszközökön}\label{chap:altalam_valtoztatott_programok}
 
 \section{JavaScriptAddon változások}
 
@@ -23,8 +23,8 @@ Több helyen is át kellett írni a JSAN2Lim-et:
       \item Több visitor-nál a várt paraméter típusát átírni, például \texttt{Class}-ról \texttt{ClassDeclarationBase}-re,
       mivel a sémában már nem \texttt{Class}-ként, hanem \texttt{ClassDeclarationBase}-ként szerepel.
       \item Több visitor-nál a várt paraméternél helyét meg kellett változtatni egyes node-nál.
-      Például a \texttt{RestElement} eddig a \texttt{Statement} package-en belül helyezkedett el, de a bővítés során átkerült a \texttt{Parameter} package-be.
-      \item A \texttt{Pattern}, mint node, \texttt{Parameter}-re lett átnevezve. A helye is megváltozott, \texttt{Statement} package-ből átkerült a \texttt{Parameter} package-be.
+      Például a \texttt{RestElement} eddig a \texttt{Statement} csomagon belül helyezkedett el, de a bővítés során átkerült a \texttt{Parameter} csomagba.
+      \item A \texttt{Pattern}, mint node, \texttt{Parameter}-re lett átnevezve. A helye is megváltozott, \texttt{Statement} csomagból átkerült a \texttt{Parameter} csomagba.
       \item Típus lekérdezésnél a \texttt{getIsClass} helyett \texttt{getIsClassDeclarationBase} kellett használni.
 \end{itemize}
 
@@ -47,14 +47,14 @@ A bővítések, hogy mikkel bővítettem a JSAN2Lim-et:
 Az AST binder referencia kötésekre (továbbiakban: bindolásra) alkalmas. Ezek a referenciák a JSAN2Lim programhoz szükségesek.
 Binder néven van definiálva a metódus a JSAN-ban.
 Kétszer van használva, ezért is kulcsfontosságú, hogy gyors legyen.
-Egyszer VariableUsages referenciákat bindol és egyszer ACG$^{~\cite{feldthaus2013efficient}}$  referenciákat bindol.
+Egyszer VariableUsages referenciákat bindol és egyszer ACG~\cite{feldthaus2013efficient}  referenciákat bindol.
 
 \noindent
 
 A binder 4 argumentumot vár:
 
 \begin{itemize}
-      \item Egy stringet, ami lehet vagy VariableUsages (továbbiakban: VU) vagy ACG$^{~\cite{feldthaus2013efficient}}$.
+      \item Egy stringet, ami lehet vagy VariableUsages (továbbiakban: VU) vagy ACG~\cite{feldthaus2013efficient}.
       \item Absztrakt Szintaxis Fát (Abstract Syntax Tree, továbbiakban: AST), ami egyedien van felépítve.
       \item Egy tömböt, amiben JSON objektumok találhatóak, amik a linkeket tartalmazzák.
       \item Végül még egy stringet, ami lehet addCalls, vagy setRefersTo. Az AddCalls és a SetRefersTo a JavaScriptAddon-ban található meg és onnan hívódik meg.
@@ -104,19 +104,27 @@ Ennek több oka is van:
 \noindent
 
 Optimalizálás során először a JavaScript Profiler-t használtam memória és futásidő vizsgálatra.
-Nekem ez nem felelt meg, mivel a JavaScriptAddon-ban rengeteg minden egymásra épül, és 50-100 mélységű függvényhívásnál nem tudta kiírni a futásidejét és a memórihasználatot.
+Nekem ez nem felelt meg, mivel a JavaScriptAddon-ban rengeteg minden egymásra épül, és 50\-100 mélységű függvényhívásnál nem tudta kiírni a futásidejét és a memórihasználatot.
 Ezután a binder metódust 3 részre bontottam \texttt{console.time} és \texttt{console.timeEnd} beépített függvénnyek segítségével.
 Futásidőt írta ki a függvény a \texttt{console.time} és a \texttt{console.timeEnd} sorok között milliszekundumban.
 Kiderült, hogy a következő sor felettébb nagy futási idővel rendelkezik:
 
 \begin{lstlisting}[caption={Lassú metódus}, label={lst:binder_problemas_function}, language={JavaScript}]
-getWrapperOfNode(resolveNode(astSet, sourceFile, element.source.range.start, element.source.range.end, true));
+getWrapperOfNode(
+      resolveNode(
+            astSet,
+            sourceFile,
+            element.source.range.start,
+            element.source.range.end,
+            true
+      )
+);
 \end{lstlisting}
 
 A resolveNode metódus első paraméterként vár egy AST-t, utána egy fájlnevet, kezdő- és végPozíciót, illetve egy igaz vagy hamis értéket.
 
-Az AST-t forEach-el bejárja a program. Az AST egyes elemei az AST node-ok.
-A forEach-en belül az AST node-on walk$^{~\cite{porter2006abstract}}$  metódus segítségével bejártuk, addig amíg nem találtuk meg a keresett node-ot.
+Az AST-t forEach-csel bejárja a program. Az AST egyes elemei az AST node-ok.
+A forEach-csen belül az AST node-on walk~\cite{porter2006abstract}  metódus segítségével bejártuk, addig amíg nem találtuk meg a keresett node-ot.
 Rosszabb esetben az AST legvégén volt a keresett node, mivel már a végén voltunk a bindolásnak.
 Kisebb projektek esetén ez nem baj, mivel az AST mérete nem akkora, mint egy nagyobb projekt esetében.
 
@@ -135,7 +143,7 @@ let indexAST = function (ast) {
 \end{lstlisting}
 
 \Aref{lst:indexAST_function} kódrészletben látható, hogy egy AST-t várunk paraméterben. Ezt a bindertől fogja kapni.
-A metódusban forEach-el bejárjuk az AST elemeit, amik az AST node-ok.
+A metódusban forEach-csel bejárjuk az AST elemeit, amik az AST node-ok.
 Beállítom a \texttt{globals.setActualFile()} függvénnyel az aktuális fájlnevet.
 Ezután az adott AST node-ot walk függvény segítségével bejárjuk.
 Csak az enter metódusát kellett szerkeszteni.
@@ -157,7 +165,7 @@ Ezt úgy teszi meg, hogy az indexedAST tömbben keres egy indexre.
 Ez az index a következőképp néz ki: FájlNév-KezdőPozíció-VégPozíció.
 Továbbá vizsgál arra is, hogy ha van ilyen indexű elem a tömbben, akkor ezen az indexen található-e már ilyen node.
 Ha van akkor nem állít be semmit, csak kilép, mivel már be van indexelve az adott node. Ha nincs, akkor beállítja az indexedAST tömbnek az adott indexre az adott node-ot.
-Az AST-t csak egyszer járjuk be a foreach-el. A bejárás után minden node be lesz indexelve a tömbbe.
+Az AST-t csak egyszer járjuk be a foreach-csel. A bejárás után minden node be lesz indexelve a tömbbe.
 
 \noindent
 
