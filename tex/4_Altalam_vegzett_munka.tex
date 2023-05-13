@@ -1,10 +1,6 @@
 \chapter{Általam végzett feladatok az elemzőeszközökön}\label{chap:altalam_valtoztatott_programok}
 
 \section{JavaScriptAddon változások}
-
-\noindent
-
-
 A séma változtatás után, magát a NodeAddonGenerator fájlt nem módosítottam.
 Ennek ellenére a JavaScriptAddon mérete lényegesen megnőtt, mivel a séma nagy bővítésen esett át.
 A JavaScript-es nyelvi elemek mellett a TypeScript-es nyelvi elemek is megtalálhatóak benne.
@@ -12,9 +8,6 @@ Emiatt sokkal több node, és hozzájuk a wrapper-ek generálódtak le.
 A JavaScript-es nyelvi elemek megmaradtak, néhány helyen még javítottunk hibákat is.
 
 \section{JSAN2Lim Bővítések}
-
-\noindent
-
 A JSAN már TypeScript fájlokat és projekteket is tud elemezni, emiatt a JSAN2Lim-et is fejleszteni kellett.
 A JSAN2Lim használja a JavaScript és a Lim ASG fájlokat egyaránt.
 
@@ -28,10 +21,10 @@ Több helyen is át kellett írni a JSAN2Lim-et:
       \item Típus lekérdezésnél a \texttt{getIsClass} helyett \texttt{getIsClassDeclarationBase} kellett használni.
 \end{itemize}
 
-A bővítések, hogy mikkel bővítettem a JSAN2Lim-et:
+Általam végbevitt bővítésem a JSAN2Lim-en:
 \begin{itemize}
       \item Több kind-ot is létrehoztunk a sémában, ezekkel bővíteni kellett a JSAN2Lim-et.
-      \item Új node visitor-ok írása. Mint például a TSEnumDeclaration, TSImportEqualsDeclaration, TSInterFaceDeclaration, és még TypeScript node amihez kell visitor.
+      \item Új node visitor-ok írása. Mint például a TSEnumDeclaration, TSImportEqualsDeclaration, TSInterfaceDeclaration, és még TypeScript node amihez kell visitor.
       A visitor-hoz a fillData függvényeket is megírni.
       \item JSAN2Lim-ben a kindStrings tömb kiegészítése TypeScript-es node-okkal.
       \item Hibák kijavítása, a VariableDeclaration-nél nem detektálta az összes változó deklarálást, főleg metódusokon belül.
@@ -40,16 +33,12 @@ A bővítések, hogy mikkel bővítettem a JSAN2Lim-et:
       \item TSEmptyBodyFunctionExpression osztály hibajavítása, hiszen több helyen is leállt a program emiatt.
 \end{itemize}
 
-\section{Ast binder optimalizálás}
-
-\noindent
-
+\section{AST binder optimalizálás}
 Az AST binder referencia kötésekre (továbbiakban: bindolásra) alkalmas. Ezek a referenciák a JSAN2Lim programhoz szükségesek.
 Binder néven van definiálva a metódus a JSAN-ban.
 Kétszer van használva, ezért is kulcsfontosságú, hogy gyors legyen.
-Egyszer VariableUsages referenciákat bindol és egyszer ACG~\cite{feldthaus2013efficient}  referenciákat bindol.
+VariableUsages és ACG~\cite{feldthaus2013efficient} referenciákat bindol.
 
-\noindent
 
 A binder 4 argumentumot vár:
 
@@ -57,7 +46,7 @@ A binder 4 argumentumot vár:
       \item Egy stringet, ami lehet vagy VariableUsages (továbbiakban: VU) vagy ACG~\cite{feldthaus2013efficient}.
       \item Absztrakt Szintaxis Fát (Abstract Syntax Tree, továbbiakban: AST), ami egyedien van felépítve.
       \item Egy tömböt, amiben JSON objektumok találhatóak, amik a linkeket tartalmazzák.
-      \item Végül még egy stringet, ami lehet addCalls, vagy setRefersTo. Az AddCalls és a SetRefersTo a JavaScriptAddon-ban található meg és onnan hívódik meg.
+      \item Végül még egy stringet, ami lehet vagy addCalls, vagy setRefersTo. Az AddCalls és a SetRefersTo a JavaScriptAddon-ban található meg és onnan hívódik meg.
       Abban az esetben kap addCalls értéket, ha ACG  referenciákat bindol a binder, és akkor setRefersTo, ha VU referenciákat.
 \end{itemize}
 
@@ -76,7 +65,7 @@ target: {...}
 \end{lstlisting}
 
 Ilyen JSON elemekből épül fel a tömb.
-A forrás és a cél objektum felépítése ugyanaz, csak másak az értékek.
+A forrás és a cél objektum felépítése ugyanaz, csak különböznek az értékek.
 A kódrészletben a cél (source) van kifejtve bővebben.
 A \texttt{label} az egy Identifier vagy PrivateIdentifier node nevét fogja jelölni.
 A \texttt{file} egy abszolút útvonalat kap, ami az Identifiert tartalmazó fájlt jelöli.
@@ -86,7 +75,6 @@ A \texttt{range} is egy objektum, a start ennél a kezdő karakter hanyadik kara
 A \texttt{node} is egy objektum ami maga az Identifier vagy PrivateIdentifier.
 
 \subsection{Lassúság okai}
-
 Binder-nek a futásideje lényegesen megnő, ha nagyon nagy projektekre futtatódik le.
 Ennek több oka is van:
 
@@ -100,11 +88,8 @@ Ennek több oka is van:
 \end{itemize}
 
 \subsection{Optimalizálás}
-
-\noindent
-
 Optimalizálás során először a JavaScript Profiler-t használtam memória és futásidő vizsgálatra.
-Nekem ez nem felelt meg, mivel a JavaScriptAddon-ban rengeteg minden egymásra épül, és 50\-100 mélységű függvényhívásnál nem tudta kiírni a futásidejét és a memórihasználatot.
+Nekem ez nem felelt meg, mivel a JavaScriptAddon-ban rengeteg minden egymásra épül, és 50-100 mélységű függvényhívásnál nem tudta kiírni a futásidejét és a memórihasználatot.
 Ezután a binder metódust 3 részre bontottam \texttt{console.time} és \texttt{console.timeEnd} beépített függvénnyek segítségével.
 Futásidőt írta ki a függvény a \texttt{console.time} és a \texttt{console.timeEnd} sorok között milliszekundumban.
 Kiderült, hogy a következő sor felettébb nagy futási idővel rendelkezik:
@@ -126,9 +111,7 @@ A resolveNode metódus első paraméterként vár egy AST-t, utána egy fájlnev
 Az AST-t forEach-csel bejárja a program. Az AST egyes elemei az AST node-ok.
 A forEach-csen belül az AST node-on walk~\cite{porter2006abstract}  metódus segítségével bejártuk, addig amíg nem találtuk meg a keresett node-ot.
 Rosszabb esetben az AST legvégén volt a keresett node, mivel már a végén voltunk a bindolásnak.
-Kisebb projektek esetén ez nem baj, mivel az AST mérete nem akkora, mint egy nagyobb projekt esetében.
-
-\noindent
+Kisebb projektek esetén ez kevésbé észrevehető, mivel az AST mérete nem akkora.
 
 Optimalizálás során, létrehoztam indexAST metódust, ami indexeli az AST-t.
 
@@ -142,7 +125,7 @@ let indexAST = function (ast) {
       return globals.indexedAST}
 \end{lstlisting}
 
-\Aref{lst:indexAST_function} kódrészletben látható, hogy egy AST-t várunk paraméterben. Ezt a bindertől fogja kapni.
+\Aref{lst:indexAST_function}-as kódrészletben látható, hogy egy AST-t várunk paraméterben. Ezt a bindertől fogja kapni.
 A metódusban forEach-csel bejárjuk az AST elemeit, amik az AST node-ok.
 Beállítom a \texttt{globals.setActualFile()} függvénnyel az aktuális fájlnevet.
 Ezután az adott AST node-ot walk függvény segítségével bejárjuk.
@@ -167,13 +150,11 @@ Továbbá vizsgál arra is, hogy ha van ilyen indexű elem a tömbben, akkor eze
 Ha van akkor nem állít be semmit, csak kilép, mivel már be van indexelve az adott node. Ha nincs, akkor beállítja az indexedAST tömbnek az adott indexre az adott node-ot.
 Az AST-t csak egyszer járjuk be a foreach-csel. A bejárás után minden node be lesz indexelve a tömbbe.
 
-\noindent
 
-\Aref{lst:binder_problemas_function} kódrészleten látható, hogy először a resolveNode függvény segítségével megkerestük a keresett node-ot kezdő- és végPozíció alapján.
+\Aref{lst:binder_problemas_function}-es kódrészleten látható, hogy először a resolveNode függvény segítségével megkerestük a keresett node-ot kezdő- és végPozíció alapján.
 Ezután a megkapott node-ra meghívtuk a \texttt{getWrapperOfNode} függvényt, hogy megkapjuk a wrapperjét a JavaScriptAddon-ból.
 A keresést megváltoztattam, írtam rá egy getIndexed metódust.
 
-\noindent
 
 A \texttt{getIndexed} függvény megvizsgálja, hogy forrás vagy cél node-ot keresünk.
 Ha cél node-ot, akkor visszaadjuk a \texttt{getWrapperOfNode(indexedAST[FájlNév-KezdőPozíció-VégPozíció])}-t.
@@ -187,7 +168,7 @@ Ha megkaptuk a cél node-ot akkor visszaadjuk azt a \texttt{getWrapperOfNode(res
       \begin{center}
       \caption{Eredmények összehasonlítása}\label{tbl:Eredmenyek}
       \begin{tabular}{c c}
-      \hline Optimalizálás előtt (m:ss.mmm) & Optimalizálás után (m:ss.mmm)\\
+      \hline Optimalizálás előtt (perc:mp.ms) & Optimalizálás után (perc:mp.ms)\\
       \hline 42:31.211 & 1:39.140\\
       \hline 2:51.045& 0:29.922\\
       \hline 1:17.825& 0:3.949\\
@@ -201,5 +182,5 @@ Ha megkaptuk a cél node-ot akkor visszaadjuk azt a \texttt{getWrapperOfNode(res
       \end{center}
 \end{table}
 
-Egy nagyobb projektre futtattam le a JSAN-t, 2 közepesre és 5 kisebbre. Az eredmények láthatóak \aref{tbl:Eredmenyek} táblázatban.
-Eredménynek ugyanazt adta mind a kettő futás, viszont futásidőben nagyon eltértek egymástól.
+Egy nagyobb projektre futtattam le a JSAN-t, 2 közepesre és 5 kisebbre. Az eredmények láthatóak \aref{tbl:Eredmenyek}-es táblázatban.
+Eredményeik egyeztek, viszont futásidőben nagyon eltértek egymástól.

@@ -1,29 +1,24 @@
 \chapter{Oszthatlan közösen készített programok}\label{chap:oszthatlan_kozos_dolgok}
 
 \section{A nyelvi séma átírása}
-
-\noindent
-
 Az eddigi JavaScript nyelvi séma (továbbiakban: séma), ami csak JavaScript nyelvű projekteket és fájlokat elemzett, a JavaScript hivatalos oldala~\cite{javascript_language} alapján készült.
-\Aref{chap:nyelvi_sema} fejezetben ami ábrák láthatóak, azok már az átírt sémából lettek kifotózva.
+\Aref{chap:nyelvi_sema}-es fejezetben ami ábrák láthatóak, azok már az átírt sémából lettek kifotózva.
 
-\noindent
 
 A séma átírásánál arra a döntésre jutottunk, hogy elölről kezdjük az egészet.
 Átláthatatlan volt az előző séma, és nem volt hozzá megfelelő dokumentáció, ezért a bővítés nehezebbnek bizonyult, mint az újraírás a kezdetekről.
 Továbbá, egy séma ami képes TypeScript fájlokat és projekteket elemezni, az képes JavaScript fájlokat és projekteket is.
-A Base csomagot emeltük át az előző sémából, BaseNode-al és BaseToken-el kibővítve. Ez látható \aref{fig:base_vpp} ábrán is.
+A Base csomagot emeltük át az előző sémából, BaseNode-al és BaseToken-el kibővítve. Ez látható \aref{fig:base_vpp}-es ábrán is.
 A TypeScript-eslint github~\cite{typescript-eslint} alapján hoztuk létre a struktrális felépítést,
 annyi változtatással, hogy mi hoztunk létre még egy structure nevű csomagot, amiben azok az osztályok találhatóak meg, amelyek a TypeScript-eslint github base mappájában voltak.
 Fejlesztés során dokumentáltuk a lépések nagy részét.
 
-\noindent
 
 Minden egymásra épült a sémában, emiatt a műkődést nem tudtuk az elején letesztelni, csak miután több csomag is készen lett.
-Megfigyelhető \aref{lst:asg_file_export_all_declaration} kódrészleten, hogy az ExportAllDeclaration több mindenből öröklődik és sok attribútuma van.
+Megfigyelhető \aref{lst:asg_file_export_all_declaration}-es kódrészleten, hogy az ExportAllDeclaration több mindenből öröklődik és sok attribútuma van.
 Az ExportAllDeclaration egyik attribútumának a típusa az ImportAttribute.
 Ehhez az ImportAttribute osztályt is le kellett fejleszteni a sémában.
-
+\pagebreak
 \begin{lstlisting}[caption={ImportAttribute},label={lst:asg_file_import_attribute}, language={JavaScript}]
 export interface ImportAttribute extends BaseNode {
       type: AST_NODE_TYPES.ImportAttribute;
@@ -32,18 +27,14 @@ export interface ImportAttribute extends BaseNode {
 }
 \end{lstlisting}
 
-Az ImportAttributet lefejlesztéséhez le kell fejleszteni az Identifiert, és a Literalt is.
-Ezek lefejlesztéséhez is kellett más-más osztályokat lefejleszteni.
+Az ImportAttribute-hoz szükséges volt az Identifiert, és a Literalt lefejleszteni.
+Ezekhez más-más osztályok lefejlesztése is szükséges volt.
 
-\noindent
 
 \section{Nehézségek, problémák}
-
-\noindent
-
 A séma újból írása során több nehézségbe ütköztünk.
 Dokumentáció hiánya miatt nem tudtuk az előző sémának minden részét jól értelmezni, néhány félreértés volt fejlesztés közben.
-Fejlesztés végén, miután az összes csomag és osztály le volt fejlesztve, próbáltuk tesztelni.
+Miután az összes csomaggal és osztállyal kész voltunk, próbáltuk tesztelni.
 Tesztelés során Segmentation Fault hibát kapott a program, és nem tudtunk rájönni, hogy miért történik ez.
 Emiatt az egész sémát átnéztük, biztosra mentünk, hogy az osztályok öröklődési jól voltak a sémában lefejlesztve, illetve az összes attribútumot is ellenőriztük.
 Több kisebb figyelmetlenséget is észrevettünk, és javítottuk.
@@ -53,7 +44,6 @@ Kiderítettük, hogy melyik node-nál áll le a program mindig, ez volt maga a L
 Ismét átnéztük a LiteralExpression osztályt, mivel ez maga a Literal, és egy rossz osztályból öröklődött le, ez okozta a program leállását.
 Javítottuk a problémát, és ezek után hibamentesen és jól letudtuk futtatni.
 
-\noindent
 
 Továbbá sok nyelvi elemet a TypeScript-ben nem ismertünk.
 Tanulmányozni kellett jobban a TypeScript programozási nyelvet~\cite{fenton2014pro, cherny2019programming, nance2014typescript, 10.1007/978-3-662-44202-9_11}, hogy tesztek átnézése során tudjuk mit elemzett le jól és mit nem.

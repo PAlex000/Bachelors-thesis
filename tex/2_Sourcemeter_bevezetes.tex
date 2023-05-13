@@ -1,9 +1,6 @@
 \chapter{SourceMeter}\label{chap:SourceMeter}
 
 \section{SourceMeter}
-
-\noindent
-
 A SourceMeter egy forráskód-elemző eszköz, amely képes statikus programelemzést végezni a C, C++, Java, Python, C\#, JavaScript, TypeScript és RPG (AS/400)~\cite{szHoke2014case}
 nyelvű összetett programok forráskódján.
 A FrontEndART a Szegedi Tudományegyetem Szoftverfejlesztés Tanszékén kutatott és fejlesztett Columbus technológián~\cite{beszedes2005columbus} alapuló SourceMeter eszközt fejlesztette ki.
@@ -11,48 +8,38 @@ A statikus kódelemzés egy olyan módszer, amely során a program forráskódj�
 Az elemzés során különböző eszközök segítségével ellenőrizhetjük a kód helyességét, hatékonyságát, biztonságosságát és karbantarthatóságát.
 Az ilyen típusú elemzés során gyakran felhasználnak különböző szabályokat és előírásokat, amelyek segítenek az azonosításban és a hibák javításában.
 
-\noindent
 
 A statikus elemzés során Absztrakt Szemantikus Gráf (ASG) készül a forráskód nyelvi elemeiből.
-Ezután az ASG-t különböző eszközökkel dolgozzák fel a csomagban annak érdekében, hogy kiszámítsák a metrikákat (LLOC~\cite{siket2014differences, bakota2011probabilistic}, NLE vagy NOA),
+Ezután az ASG-t különböző eszközökkel dolgozzák fel a csomagban annak érdekében, hogy kiszámítsák a metrikákat (például: LLOC~\cite{siket2014differences, bakota2011probabilistic}, NLE vagy NOA),
 azonosítsák az ismételt kódrészleteket (másolás-beszúrás; klónok), a kódolási szabályszegéseket, stb.
 A SourceMeter képes elemzést végezni olyan forráskódon, amely megfelel a Java 8 és korábbi verzióinak, a C/C++,
 az RPG III és az RPG IV verzióinak (beleértve a szabadon formázottakat), a C\# 6.0 és korábbi verzióinak, valamint a Python 2.7.8 és korábbi verzióinak.
 A C/C++ esetében a SourceMeter támogatja az ISO/IEC 14882:2011~\cite{sourcemeter2015} nemzetközi szabványt, amelyet kiegészítettek az ISO/IEC 14882:2014 új funkcióival, és a C nyelvet az ANSI/ISO 9899:1990, az ISO/IEC 9899:1999 és az ISO/IEC 9899:2011 szabványok határozzák meg.
 Az alapértelmezett funkciókon túl, a GCC és a Microsoft által meghatározott kiterjesztések is támogatottak.
 
-\noindent
 
 A SourceMeter a QualityGate~\cite{bakota2014qualitygate} eszközben van használva.
 
-\noindent
 
-A SourceMeternek található egy plug-in a SonarQubehoz.
+A SourceMeternek található egy plug-in a SonarQube-hoz.
 A SourceMeter plug-in a SonarQube platformhoz egy kiterjesztése az nyílt forráskódú SonarQube platformnak, amelyet a kód minőségének kezelésére használnak
 A plug-in a SourceMeter-t futtatja a SonarQube platformról, és feltölti a forráskód elemzésének eredményeit a SourceMeter-től a SonarQube adatbázisába.
 A plug-in nyílt forráskódú, és az összes szokásos SonarQube kódelemzési eredményt biztosítja, kiegészítve sok további metrikával és problémakeresővel, amelyeket a SourceMeter eszköz biztosít.
 A plug-in támogatja a C/C++, a Java, a C\#, a Python és a RPG nyelveket.~\cite{ferenc2014source}
 
 \section{SourceMeter for JavaScript}
-
-\noindent
-
 A SourceMeter for JavaScript a SourceMeternek egy nagyobb alprojektje.
 A SourceMeter for JavaScript egy olyan eszköz, amely lehetővé teszi a statikus forráskód elemzést a bonyolult JavaScript és TypeScript rendszerekben.
 Képes felismerni a kód hibáit, mint például a nem definiált változók vagy függvények használata, a nem biztonságos kódrészletek, a nem hatékony kódrészletek, valamint a redundáns és ismétlődő kódok.
 Ezenkívül az eszköz képes összehasonlítani a kódot az általános gyakorlatokkal és a meghatározott szabályokkal, és jelezni az eltéréseket.
 Az ilyen eszközök használata segíthet az észlelt hibák javításában és a kód minőségének javításában, ami végső soron javíthatja a rendszer biztonságát és hatékonyságát.
 
-\noindent
 
 A SourceMeter for JavaScript projekt több alprojektet is magába foglal, amelyek különböző részfeladatokra specializálódnak.
 
 \subsection{Nyelvi séma bevezetés}\label{chap:nyelvi_sema}
-
-\noindent
-
 A JavaScript nyelvi séma(továbbiakban: séma)~\cite{ferenc2002columbus} egy UML Diagramhoz hasonlító séma.
-A Visual Paradigm(továbbiakban: vpp) alkalmazással szerkeszthető.
+A Visual Paradigm (továbbiakban: vpp) alkalmazással szerkeszthető.
 Azért szerkesztjük a sémát vpp-ben, mivel a többi nyelvi változat esetében is így volt, és van konverter, ami ebből a vpp fájlból létrehozza a C++ alap fájlokat, amiket az elemző programok tudnak használni.
 A felépítése a következőképpen néz ki:
 
@@ -62,7 +49,7 @@ A felépítése a következőképpen néz ki:
       \includegraphics[width=0.4\textwidth]{JavaScriptSchema_struktura.png}
 \end{figure}
 
-\Aref{fig:JavaScriptSchema_struktura} ábrán a ProjektNév/Model/Csomagok struktúra figyelhető meg.
+\Aref{fig:JavaScriptSchema_struktura}-es ábrán a ProjektNév/Model/Csomagok struktúra figyelhető meg.
 A projekt neve JavaScript, ezen belül található egy model, amit javascript-nek hívnak.
 A modellen belül találhatóak meg a csomagok.
 A csomagok a TypeScript séma~\cite{typescript-eslint} alapján lettek elnevezve.
@@ -75,18 +62,17 @@ A csomagok a következőképpen épülnek fel:
       \includegraphics[width=0.9\textwidth]{base_vpp.png}
 \end{figure}
 
-\Aref{fig:base_vpp} ábrán a Base, Node, Positioned, Comment, System, Named, BaseNode, BaseToken, Program, ProgramStatement és a Token osztályok találhatóak.
+\Aref{fig:base_vpp}-es ábrán a Base, Node, Positioned, Comment, System, Named, BaseNode, BaseToken, Program, ProgramStatement és a Token osztályok találhatóak.
 A Base osztályból öröklődik minden osztály.
 A Base osztály rendelkezik id attribútummal, ami NodeId típusú.
 
-\noindent
 
 Az absztrakciót zöld háttérszínnel jelöltük.
 A séma könnyebb bővíthetősége és olvashatósága miatt jeleztük így, illetve más nyelvi sémákban is ezt a logikát követjük.
 Más csomagokban lévő definiálást szürke háttérszínnel, ugyanabban a csomagban lévő definiálást világosszürke háttérszínnel jelöltük.
 Az alapértelmezett osztályt kék háttérszínnel jelöltük.
 A Positioned osztályból öröklődnek a Named, BaseNode és a BaseToken osztályok.
-A BaseNode osztályból több minden öröklődik, mint például a DeclarationStatement, ImportDeclaration, Expression és több minden is. Ez látható \aref{fig:declaration_vpp} ábrán.
+A BaseNode osztályból több minden öröklődik, mint például a DeclarationStatement, ImportDeclaration, Expression és több minden is. Ez látható \aref{fig:declaration_vpp}-as ábrán.
 A Positioned osztály rendelkezik position attribútummal, ami Range típusú. A Positioned osztályhoz tartozhatnak kommentek is.
 A Comment osztály öröklődik a Positioned osztályból, ezzel biztosítva azt, hogy minden kommentnek lesz pozíciója.
 A Comment osztály rendelkezik text, type és location attribútummal.
@@ -98,7 +84,6 @@ A ProgramSourceType is a DataStructures csomagban lett definiálva. A ProgramSou
 A Base csomag eltér a TypeScript-eslint~\cite{typescript-eslint} projektben lévő Base csomagtól.
 Régebbi sémának a Base csomagét használjuk, BaseNode és BaseToken osztályok kibővítésével.
 
-\noindent
 
 Mivel a Base csomag egyedi a mi esetünkben, ezért kitérnék a Declaration csomagra is.
 A Declaration csomagon belül az ExportAllDeclaration osztályt mutatom be.
@@ -112,8 +97,8 @@ export interface ExportAllDeclaration extends BaseNode {
       source: StringLiteral;
 }
 \end{lstlisting}
-
-\Aref{lst:ExportAllDeclaration} kódrészlet megvalósítása a sémában:
+\pagebreak
+\Aref{lst:ExportAllDeclaration}-es kódrészlet megvalósítása a sémában:
 
 \begin{figure}[!htbp]
       \caption{A Declaration csomag felépítése}\label{fig:declaration_vpp}
@@ -123,7 +108,7 @@ export interface ExportAllDeclaration extends BaseNode {
 
 Az ExportAllDeclaration osztály öröklődik a DeclarationStatement osztályból, ami öröklődik a BaseNode osztályból.
 Ezért az ExportAllDeclaration egyaránt öröklődik a BaseNode osztályból.
-\Aref{lst:ExportAllDeclaration} kódrészletben ez az \texttt{extends BaseNode}-al van jelezve.
+\Aref{lst:ExportAllDeclaration}-es kódrészletben ez az \texttt{extends BaseNode}-al van jelezve.
 A főbb osztályok a BaseNode alatt találhatóak az ábrán.
 Az ábra jobb oldalán lévő osztályok, amik sötét- és világosszürkével vannak jelölve, az attribútumok.
 Az ExportAllDeclaration osztály öröklődik a Statement, DeclarationStatement, Node és a ProgramStatement osztályokból.
@@ -137,10 +122,9 @@ Az Exported attribútum opcionális, ezért az értéke lehet null is. Ezt a sé
 A Source attribútum is opcionális, típusa StringLiteral.
 Végül, ExportKind attribútummal is rendelkezik, típusa ExportAndImportKind.
 Az ExportAndImportKind az a DataStructures csomagban lett definiálva.
-Így lett minden csomag és osztály felépítve.
+Ilyen módon lett minden csomag és osztály felépítve.
 A DeclarationStatement, Statement, ProgramStatement és több osztály, ami a unions mappában található, gyűjtő osztály, aminek a jelentősége a JavaScriptAddon-nál fog mutatkozni.
 
-\noindent
 
 A DataStructures csomag többször volt említve, hadd mutassam be a következő ábrán a felépítésést:
 
@@ -150,20 +134,19 @@ A DataStructures csomag többször volt említve, hadd mutassam be a következő
       \includegraphics[width=0.8\textwidth]{data_structures.png}
 \end{figure}
 
-A DataStructures csomagban található 2 csomag, Kinds és Typedefs. \Aref{fig:JavaScriptSchema_struktura} ábrán látható. Ebből a Kinds csomagot mutatom be.
-\Aref{fig:data_structures_kinds} ábrán a Kinds csomagnak egy kisebb része látható.
+A DataStructures csomagban található 2 csomag, Kinds és Typedefs. \Aref{fig:JavaScriptSchema_struktura}-es ábrán látható. Ebből a Kinds csomagot mutatom be.
+\Aref{fig:data_structures_kinds}-es ábrán a Kinds csomagnak egy kisebb része látható.
 Enumok vannak deklarálva ebben a csomagban.
 Az enumokban konstansok találhatóak. Minden konstans előtt található 3 karakter, ezek a karakterek ASG konvertáláskor el fognak tűnni.
 Ha ExportAndImportKind-ot adunk meg egy attribútum típusának, akkor az attribútum típusa lehet Type vagy Value.
 
-\noindent
 
 A séma használata előtt először ki kell exportálni a projektet. A vpp segítségével tehető meg, egy xml formátumú fájlba exportálódik egész projekt.
 Ezután ezt a fájlt át kell konvertálni ASG kiterjesztésű fájlra.
 UmlToAsg eszközzel tehető ez meg, ami a SourceMeter alprojektjei közé tartozik.
 Ez a projekt egy xml fájlból egy ASG fájlt generál.
 Az UmlToAsg projekt a SchemaGenerator által generálódik.
-A SchemaGenerator C++ nyelven megírt eszköz, a SourceMeter alprojektjei közé tartozik.
+A SchemaGenerator C nyelven megírt eszköz, a SourceMeter alprojektjei közé tartozik.
 Több mindent is generál C, C++, vagy Java nyelven.
 A generált ASG fájl elején a következő sorok láthatóak:
 
@@ -173,6 +156,7 @@ APIVERSION = 0.3.1;
 BINARYVERSION = 0.3.1;
 CSIHEADERTEXT = JavaScriptLanguage;
 \end{lstlisting}
+\pagebreak
 
 A verziókat kézzel tudjuk átírni abban a fáljban ami generálja ezt, ez egy C++ fájl, a SchemaGeneratorban található meg.
 Ezután a Kinds csomag tartalmát írja bele a következőképpen:
@@ -184,9 +168,9 @@ KIND ASTNodeTypes (ant) {
       ClassDeclaration;}
 \end{lstlisting}
 
-A 3 karakter, amit minden konstans előtt szerepel, azok kikerülnek paraméterbe és csak az utáni stringet írta át az ASG fájlba.
+A 3 karakter, ami minden konstans előtt szerepel, azok kikerülnek paraméterbe és csak az utáni stringet írta át az ASG fájlba.
 Ugyanígy jár el a többi enumnál is.
-Ha az összes enumot beleírta, akkor a többi csomagot kezdi el bele írni a fájlba. \Aref{fig:JavaScriptSchema_struktura} alapján halad sorban.
+Ha az összes enumot beleírta, akkor a többi csomagot kezdi el bele írni a fájlba. \Aref{fig:JavaScriptSchema_struktura}-es ábra alapján halad sorban.
 Példának a Declaration csomagot mutatom be, azon belül is az ExportAllDeclaration osztályt.
 
 \begin{lstlisting}[caption={ASG fájl ExportAllDeclaration},label={lst:asg_file_export_all_declaration}, language={JavaScript}]
@@ -210,16 +194,13 @@ Az EDGE TREE után álló szám vagy csillag, az adott attribútum multiplicitá
 A vagyolást egy \texttt{|} jellel jelzi.
 Az öröklődést kettősponttal jelzi.
 Felsorolásszerűen írta át, ha valami másból származik, akkor \texttt{csomagNev::osztalyNev} alapján.
-\Aref{fig:declaration_vpp}as ábrán látható, hogy mit hogyan írt át.
+\Aref{fig:declaration_vpp}-as ábrán látható, hogy mit hogyan írt át.
 
 \subsection{JavaScriptAddon}\label{chap:javaScriptAddon_bevezetes}
-
-\noindent
-
 A JavaScriptAddon a SchemaGenerator által generált fájl.
-\Aref{lst:asg_file_export_all_declaration} kódrészleten látható, hogy node-okat generált az UmlToAsg az osztályokból.
+\Aref{lst:asg_file_export_all_declaration}-es kódrészleten látható, hogy node-okat generált az UmlToAsg az osztályokból.
 Ezeknek a node-oknak a SchemaGenerator generál külön egy WrapperHeader és egy WrapperCC fájlt.
-A SchemaGenerator továbbá generál Factory.cc és a hozzátartozó header fájlt. A Factory.cc-t bővebben taglalom \aref{lst:factory_cc} kódrészletnél.
+A SchemaGenerator továbbá generál Factory.cc és a hozzátartozó header fájlt. A Factory.cc-t bővebben taglalom \aref{lst:factory_cc}-es kódrészletnél.
 A WrapperCC, Factory.cc és a hozzájuk tartozó header fájlok összeolvasztása eredményezi a JavaScriptAddon fájlt.
 A JavaScriptAddon fájl generálás menetét a NodeAddonGenerator fájlban található.
 A SchemaGenerator main.c fájlba beimportálja a NodeAddonGenerator összes metódusát, aztán ezeket a metódusokat használva legenerálja a JavaScriptAddon fájlt.
@@ -237,6 +218,7 @@ Az alapértelmezett értéke az \texttt{options.generateNodeAddon}-nak hamis.
 Több fájl generálás után, ami kell több program működéséhez, megvizsgálja az \texttt{options.generateNodeAddon}-t.
 Ha az \texttt{options.generateNodeAddon} hamis, akkor nem fog semmi se történni.
 
+\pagebreak
 \begin{lstlisting}[caption={SchemaGenerator JavaScriptAddon generálás},label={lst:schemagenerator_genNodeAddon_check}, language={CStyle}]
 if (createAndEnterDirectory(SOURCE_NODE_ADDON_DIR_NAME)) {
       generatePackageJson();
@@ -262,11 +244,10 @@ fprintf(f, "    \"rebuild\": \"node-gyp configure && node-gyp rebuild -j 8\",\n"
 fprintf(f, "    \"install\": \"node-gyp configure && node-gyp build -j 8\"\n");
 \end{lstlisting}
 
-\Aref{lst:nodeAddonGenerator_package_json} kódrészleten látható, hogy a node-gyp build segítségével fog történni a buildelés.
+\Aref{lst:nodeAddonGenerator_package_json}-es kódrészleten látható, hogy a node-gyp build segítségével fog történni a buildelés.
 A node-gyp egy eszköz, amely összeállítja a Node.js Addonokat. A Node.js Addonok natív Node.js modulok, amelyeket C vagy C++ nyelven írnak.
 Miután az ilyen modulokat eszközökkel, például a node-gyppel lefordították, funkcióik elérhetők lesznek a \texttt{require()} segítségével, ahogy bármely más Node.js modul esetében.
 
-\noindent
 
 A package.json fájl után generálja le a binding.gyp fájlt.
 A binding.gyp fájlban találhatóak meg az összes node fájl relatív útvonala a package.json fájlhoz képest.
@@ -293,26 +274,23 @@ return true;
 \end{lstlisting}
 
 Ha a jelenlegi node absztrakt, akkor nem ír semmit a fájlba.
-Ha nem absztrakt, akkor \aref{lst:addoncc_wrapper_includes_implementation} kódrészlet alapján importálja a node-nak a header fájl relatív útvonalát.
+Ha nem absztrakt, akkor \aref{lst:addoncc_wrapper_includes_implementation}-es kódrészlet alapján importálja a node-nak a header fájl relatív útvonalát.
 A \texttt{node->name} több értéket is vehet fel, például FunctionDeclaration, ClassDeclaration, ezek megtalálhatóak az ASG fájlban.
-Ezután ez a bejárás még egy alkalommal végrehajtódik. Ebben az esetben a wrapperIniteket ír az addonCC fájlba.
+Ezután ez a bejárás még egy alkalommal végrehajtódik. Ebben az esetben wrapperIniteket ír az addonCC fájlba.
 
 \begin{lstlisting}[caption={generateWrapInit leimplementálása}, label={lst:addoncc_wrapper_inits_implementation}, language={CStyle}]
 fprintf(f, "  columbus::%s::asg::addon::%sWrapper::Init(env, exports);\n", schemaName, node->name);
 \end{lstlisting}
 
-\noindent
 
 Az addonCC fájl generálása után a generateFactoryWrapper függvényhívás történik.
 Ebben a függvényben 2 metódus függvényhívás található, a generateFactoryWrapperHeader és generateFactoryWrapperSource.
 
-\noindent
 
 A generateFactoryWrapperHeader a Factory.h fájlt generálja le.
 Először importálja az összes nodeWrapper header fájlt, és utána létrehoz egy Factory osztályt, a publikus metódusait, ami az Init és Destructor, illetve a private metódusait,
 ami a destructor, New, SaveAST, LoadAST, Clear, getRoot és az összes nodeWrapper create metódusai.
 
-\noindent
 
 A generateFactoryWrapperSource a Factory.cc fájlt generálja le.
 \texttt{DECLARE\_NAPI\_METHOD}-okat hoz létre, az összes nodeWrapper fájlnak.
@@ -324,12 +302,10 @@ napi_property_descriptor props [] = {
       ...}
 \end{lstlisting}
 
-\noindent
 
 Legvégül, a SchemaGenerator legenerálja az inc és az src mappákat.
 Az inc mappában találhatóak a header fájlok minden egyes nodeWrapper-nek, az src mappában maguk a nodeWrapper-ek vannak megvalósítva.
 
-\noindent
 
 A SchemaGenerator legenerálja az ExportAllDeclarationWrapper.h és az ExportAllDeclaration.cc fájlokat.
 A header fájlban létrehozza az ExportAllDeclarationWrapper osztályt, ami öröklődik a BaseWrapperből. A BaseWrapper alap Wrapper osztály.
@@ -344,21 +320,17 @@ napi_property_descriptor props [] = {
 ...}
 \end{lstlisting}
 
-\Aref{lst:ExportAllDeclarationWrapper_header} kódrészleten megfigyelhető, hogy létrehozott az ExportAllDeclarationWrapper-nek egy setPosition, addAssertions, setType metódusokat.
+\Aref{lst:ExportAllDeclarationWrapper_header}-es kódrészleten megfigyelhető, hogy létrehozott az ExportAllDeclarationWrapper-nek egy setPosition, addAssertions, setType metódusokat.
 Ezek az ExportAllDeclaration attribútumai, ami a sémában be lett állítva.
-\Aref{fig:declaration_vpp} ábrán látható, hogy az ExportAllDeclaration hasAssertions attribútumának a multiplicitása 1..*, ezt átkonvertálta addAssertions-re.
+\Aref{fig:declaration_vpp}-as ábrán látható, hogy az ExportAllDeclaration hasAssertions attribútumának a multiplicitása 1..*, ezt átkonvertálta addAssertions-re.
 Ahol 0..* a multiplicitás, azt átkonvertálta setAttribute-ra, például setSource vagy setExported-re.
 Minden nodeWrapper rendelezik setPath, setPosition, setType és addComments metódusokkal.
 
-\noindent
 
 Az ExportAllDeclaration.cc fájlt ugyanúgy generálja le, mint a Factory.cc fájlt. \texttt{DECLARE\_NAPI\_METHOD}-okat generál, a setExported, setSource, setType és a többi metódushoz.
 Ezután az összes metódust megvalósításra kerül.
 
 \subsection{JSAN2Lim}
-
-\noindent
-
 A JSAN2Lim C++ programozási nyelvben megírt program. A JSAN általi eredményt alakítja át nyelvfüggetlen (továbbiakban: LIM) formátumú fájlokra.
 Azért LIM formátumú fájlokra alakít át, mivel egy nyelvfüggetlen modellen sokkal könnyebb metrikákat mérni.
 A JSAN2Lim függ a JSAN programtól, hiszen a JSAN eredményeit alakítja át.
@@ -367,13 +339,11 @@ A JSAN2Lim használja a LimSchema-t. A LimSchema hasonlóan van felépítve, min
 A JSAN2Lim bejárja az összes node-ot ami megtalálható a JSAN általi eredmény fájlban.
 Minden node-ra külön meg kell írni a bejáró (továbbiakban: visit) függvényt.
 
-\noindent
 
 A JSAN2Lim működését egy kódrészleten keresztül mutatom be.
-\begin{lstlisting}[caption={ClassDeclaration Visitor}, label={lst:classdeclaration_visitor}, language={CStyle}]
+\begin{lstlisting}[caption={ClassDeclaration Visitor}, label={lst:classdeclaration_visitor}, language={CStyle}, basicstyle=\fontsize{9}{9}\selectfont\ttfamily]
 VISIT_BEGIN(clNode, callVirtualBase);
-lim::asg::logical::Class& classLimNode =
-dynamic_cast<lim::asg::logical::Class&>(createLimNode(clNode, callVirtualBase));
+lim::asg::logical::Class& classLimNode = dynamic_cast<lim::asg::logical::Class&>(createLimNode(clNode, callVirtualBase));
 fillData(classLimNode, clNode);
 fillMemberData(classLimNode);
 demangledNameParts.push_back(classLimNode.getName());
@@ -400,7 +370,6 @@ Ez a típus a LimSchema-ban található meg, a logical csomagban.
 A változónak a createLimNode metódus által visszaadott node lesz az értéke.
 Ezt az értéket konvertáljuk át a erre a \texttt{lim::asg::logical::Class\&} típusra.
 
-\noindent
 
 A createLimNode függvény meghívja a createNode függvényt. Ez a függvény vár paraméterbe egy nodeKind-ot.
 A nodeKind a node típúsát jelöli.
@@ -411,21 +380,19 @@ Ezek az értékek a következők lehetnek: ndkClass, ndkMethod, ndkParameter, nd
 Ezek az értékek mind a LimSchema-ban vannak deklarálva. A nodeKind értékadása után a függvény visszaadja ezt a változót és tovább használja a visitor-ban.
 Ezután, a createLimNode függvény létrehozza a megfelelő node-ot a nodeKind-tól függően. Beállítja a pozícióját a node-nak és visszaadja a *limNode-ot.
 
-\noindent
 
 Ebben az esetben a nodeKind az ndkClass értéket kapja meg.
 A classLimNode értékadás után meghívódik a fillData függvény.
 Kettő paramétert vár, classLimNode-ot, és a node-ot.
-A fillData a JSAN általi adott eredményet bejárja, visitorok segítségével.
+A fillData a JSAN által adott eredményt bejárja, visitorok segítségével.
 A fillData-ban beállítódik a limnode láthatósága, nyelve, az hogy absztrakt-e és a classKind-ja, ami jelen esetben clkClass értéket fog felvenni.
 
 Ezután beállítódik a limnode neve. Ha a node-nak volt identifier-e, akkor a \texttt{getName} függvénnyel beállítódik a limnode neve különben \texttt{anonymousClass} érték állítódik be.
 Ezután megvizsgálja, hogy a methodstack (ami egy stack és metódusokat tartalma) üres-e.
-Ha nem üres, akkor létezik szülője, ezért a SAFE\_EDGE metódussal hozzáadódik egy csúcs a szülő és a jelenlegi limnode között.
+Ha nem üres, akkor létezik szülője, ezért a \texttt{SAFE\_EDGE} metódussal hozzáadódik egy csúcs a szülő és a jelenlegi limnode között.
 Ezt ugyanúgy megvizsgálja a  packageStack-re (ami egy stack és csomagokat tartalmaz), ha nem üres, akkor ugyanezt elvégzi csak a szülő más lesz.
 Legvégül az \texttt{addIsContainedInEdge} függvény meghívódik a limnode és a jsNode paraméterekkel.
 
-\noindent
 
 Ezután a \texttt{fillMemberData} függvény hívódik meg.
 Ez a függvény a limnode pozícióját állítja be, és a nevén változtat.
@@ -433,10 +400,6 @@ Utána a classStack-hez hozzáadódik az adott osztály tulajdonságai, beállí
 Minden egyes node-nál ez az eljárás fut le.
 
 \subsection{Regressziós tesztelés}
-
-\noindent
-
-
 A regressziós tesztelés általában egy olyan szoftvertesztelési típus, amely akkor használatos, amikor megerősítjük, hogy a legfrissebb program- vagy kódmódosítások nem érintették negatív módon a meglévő funkciókat.
 A regressziós tesztelés során megállapítják, hogy a szoftver vagy alkalmazás megfelelően működik-e az új változások és hibajavítások tekintetében.
 A regressziós tesztelés főként arról szól, hogy az már végrehajtott teszteseteket újra lefuttatjuk annak érdekében, hogy megerősítsük, az alkalmazás megfelelően működik-e.
